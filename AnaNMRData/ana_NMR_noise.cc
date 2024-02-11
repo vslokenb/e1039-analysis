@@ -1,7 +1,7 @@
 #include "NMRDataManager.h"
 void DrawPolySignal(TH2* h2_vt, const int i_evt_b, const int i_evt_e, const int time_b, const int time_e);
 
-void ana_NMR_poly_signal()
+void ana_NMR_noise()
 {
   NMRDataManager man;
   man.Verb(0); // 0 = silent, 1 = some, 2 = every event
@@ -9,8 +9,7 @@ void ana_NMR_poly_signal()
   ///
   /// Read event file(s).
   ///
-  man.ReadEventFile("2024-02-08_19h02m57s");
-  man.ReadEventFile("2024-02-08_22h13m47s");
+  man.ReadEventFile("2024-02-10_18h41m29s");
 
   int ScanSweeps; // N of sweeps per measurement
   int ScanSteps;  // N of frequency steps per scan
@@ -22,7 +21,7 @@ void ana_NMR_poly_signal()
   ///
   /// Set the reference time.  Set 'utime0' to 0 to pick up the time of the 1st data.
   ///
-  TTimeStamp ts0(2024, 2, 8, 18, 0, 0);
+  TTimeStamp ts0(2024, 2, 9, 18, 0, 0);
   int utime0 = ts0.GetSec() + TTimeStamp::GetZoneOffset();
 
   ///
@@ -33,6 +32,7 @@ void ana_NMR_poly_signal()
   double sig_min, sig_max;
   man.GetPolySignalRange(sig_min, sig_max);
   TH2* h2_vt = new TH2D("h2_vt", "", ScanSteps, RF_lo, RF_hi,  100, sig_min, sig_max);
+  TGraphErrors* gr_noise = new TGraphErrors();
 
   const int n_draw_step = 50; // h2_vt is drawn every "n_draw_step" events.
   int i_evt_draw = -1;
@@ -46,7 +46,7 @@ void ana_NMR_poly_signal()
     if (utime0 == 0) utime0 = evt_num;
     if (evt_num < utime0) continue;
     NMRSignal* sig = man.GetPolySignal(evt_num);
-    if (sig->GetNumPoint() != ScanSteps) continue; // The poly signal is sometimes empty.
+    if (sig->GetNumPoint() != ScanSteps) continue;
     i_evt_ok++;
 
     if (i_evt_draw < 0) {
@@ -61,6 +61,20 @@ void ana_NMR_poly_signal()
     if ((i_evt_ok + 1) % n_draw_step == 0 ||
         i_evt == n_evt - 1) {
       DrawPolySignal(h2_vt, i_evt_draw, i_evt_ok, utime_draw-utime0, evt_num-utime0);
+
+      TH1* h1_lo = h2_vt->ProjectionY("h1_lo",              1, ScanSteps/10);
+      TH1* h1_hi = h2_vt->ProjectionY("h1_hi", ScanSteps*9/10, ScanSteps   );
+      h1_lo->Add(h1_hi);
+      double rms      = h1_lo->GetRMS();
+      double rms_err  = h1_lo->GetRMSError();
+      int    n_gr_pt  = gr_noise->GetN();
+      double time     = evt_num/2.0 + utime_draw/2.0 - utime0;
+      double time_err = (evt_num - utime_draw) / 2.0;
+      gr_noise->SetPoint     (n_gr_pt, time    /3600, rms    );
+      gr_noise->SetPointError(n_gr_pt, time_err/3600, rms_err);
+      delete h1_lo;
+      delete h1_hi;
+
       i_evt_draw = -1;
       h2_vt->Reset();
     }
@@ -69,8 +83,21 @@ void ana_NMR_poly_signal()
   ///
   /// Draw graphs/histograms.
   ///
-  // n/a
+  TCanvas* c1 = new TCanvas("c1", "", 3200, 600);
+  c1->SetGrid(true);
+  c1->SetMargin(0.03, 0.03, 0.1, 0.1); // (l, r, b, t)
+  gStyle->SetOptStat(0);
+  TGaxis::SetMaxDigits(4);
 
+  gr_noise->SetTitle((";Hours since " + NMRUtil::ConvEventNum(utime0) + ";Std. dev. of PolySignal outer regions").c_str());
+  gr_noise->GetYaxis()->SetTitleOffset(0.4);
+  gr_noise->SetMarkerStyle(7);
+  gr_noise->SetMarkerColor(kRed);
+  gr_noise->SetLineColor  (kRed);
+  gr_noise->Draw("AP");
+
+  c1->SaveAs("gr_noise.png");
+  delete c1;
   exit(0);
 }
 
