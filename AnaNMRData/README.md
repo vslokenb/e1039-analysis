@@ -15,4 +15,4 @@ ls result
 
 ## Contact
 
-Kenichi Naknao <knakano@nucl.phys.titech.ac.jp>
+Kenichi Naknao <knakano0524@gmail.com>
