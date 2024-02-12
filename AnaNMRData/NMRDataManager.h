@@ -7,6 +7,7 @@
 class NMRDataManager {
   int m_verb;
   std::string m_dir_base;
+  std::vector<std::string> m_list_label;
   std::vector<NMREvent> m_list_evt;
   std::map<int, NMRSignal> m_list_raw_sig;
   std::map<int, NMRSignal> m_list_poly_sig;
@@ -28,9 +29,11 @@ public:
   NMREvent* GetEvent(const int index) { return &m_list_evt[index]; }
   NMREvent* FindEvent(const int evt_num);
   void ClearEvent() { m_list_evt.clear(); }
-  void ReadEventFile(const std::string label, const bool read_signal_files=true);
+  void ReadEventFile(const std::string label);
   void ReadRawSignalFile (const std::string label);
   void ReadPolySignalFile(const std::string label);
+  void ReadRawSignalFileListed ();
+  void ReadPolySignalFileListed();
 
   NMRSignal* GetRawSignal (const int evt_num);
   NMRSignal* GetPolySignal(const int evt_num);
@@ -70,7 +73,7 @@ NMREvent* NMRDataManager::FindEvent(const int evt_num)
   return 0;
 }
 
-void NMRDataManager::ReadEventFile(const std::string label, const bool read_signal_files)
+void NMRDataManager::ReadEventFile(const std::string label)
 {
   std::string fname = m_dir_base + "/" + label + ".csv";
   ifstream ifs(fname.c_str());
@@ -78,6 +81,7 @@ void NMRDataManager::ReadEventFile(const std::string label, const bool read_sign
     cerr << "!!ERROR!!  Cannot find the event file for '" << label << "': " << fname << ".  Abort." << endl;
     exit(1);
   }
+  m_list_label.push_back(label);
   
   bool has_key = (NMREvent::GetNumKey() > 0);
   int i_key = 0; // Used only when has_key is true.
@@ -115,11 +119,6 @@ void NMRDataManager::ReadEventFile(const std::string label, const bool read_sign
     if (Verb() > 1) cout << endl;
   }
   ifs.close();
-
-  if (read_signal_files) {
-    ReadRawSignalFile(label);
-    ReadPolySignalFile(label);
-  }
 }
 
 void NMRDataManager::ReadRawSignalFile(const std::string label)
@@ -184,26 +183,54 @@ void NMRDataManager::ReadPolySignalFile(const std::string label)
   ifs.close();
 }
 
+void NMRDataManager::ReadRawSignalFileListed()
+{
+  if (Verb() > 0) cout << "Reading RawSignal file(s)..." << endl;
+  for (auto it = m_list_label.begin(); it != m_list_label.end(); it++) {
+    ReadRawSignalFile(*it);
+  }
+  if (m_list_raw_sig.size() == 0) {
+    cerr << "!!ERROR!!  No RawSignal record was found.  Abort." << endl;
+    exit(1);
+  }
+}
+
+void NMRDataManager::ReadPolySignalFileListed()
+{
+  if (Verb() > 0) cout << "Reading PolySignal file(s)..." << endl;
+  for (auto it = m_list_label.begin(); it != m_list_label.end(); it++) {
+    ReadPolySignalFile(*it);
+  }
+  if (m_list_poly_sig.size() == 0) {
+    cerr << "!!ERROR!!  No PolySignal record was found.  Abort." << endl;
+    exit(1);
+  }
+}
+
 NMRSignal* NMRDataManager::GetRawSignal(const int evt_num)
 {
+  if (m_list_raw_sig.size() == 0) ReadRawSignalFileListed();
   if (m_list_raw_sig.find(evt_num) == m_list_raw_sig.end()) return 0;
   return &m_list_raw_sig[evt_num];
 }
 
 NMRSignal* NMRDataManager::GetPolySignal(const int evt_num)
 {
+  if (m_list_poly_sig.size() == 0) ReadPolySignalFileListed();
   if (m_list_poly_sig.find(evt_num) == m_list_poly_sig.end()) return 0;
   return &m_list_poly_sig[evt_num];
 }
 
 void NMRDataManager::GetRawSignalRange(double& min, double& max)
 {
+  if (m_list_raw_sig.size() == 0) ReadRawSignalFileListed();
   min = m_raw_sig_min;
   max = m_raw_sig_max;
 }
 
 void NMRDataManager::GetPolySignalRange(double& min, double& max)
 {
+  if (m_list_poly_sig.size() == 0) ReadPolySignalFileListed();
   min = m_poly_sig_min;
   max = m_poly_sig_max;
 }

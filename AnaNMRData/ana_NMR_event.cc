@@ -4,6 +4,7 @@ void ana_NMR_event()
 {
   NMRDataManager man;
   //man.Verb(1); // 0 = silent, 1 = some, 2 = every event
+  gSystem->mkdir("result", true);
 
   ///
   /// Read event file(s).
@@ -52,13 +53,13 @@ void ana_NMR_event()
   gr_pol->SetTitle( (";Hours since "+NMRUtil::ConvEventNum(utime0)+";Polarization").c_str() );
   gr_pol->SetMarkerStyle(7);
   gr_pol->Draw("AP");
-  c1->SaveAs("gr_pol.png");
+  c1->SaveAs("result/gr_pol.png");
 
   gr_pres->SetTitle( (";Hours since "+NMRUtil::ConvEventNum(utime0)+";Pressure (Torr)").c_str() );
   gr_pres->SetMarkerStyle(7);
   gr_pres->Draw("AP");
   gr_pres->GetYaxis()->SetRangeUser(21.0, 26.0);
-  c1->SaveAs("gr_pres.png");
+  c1->SaveAs("result/gr_pres.png");
 
   delete c1;
   exit(0);

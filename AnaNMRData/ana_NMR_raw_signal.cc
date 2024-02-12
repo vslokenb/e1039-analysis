@@ -4,6 +4,7 @@ void ana_NMR_raw_signal()
 {
   NMRDataManager man;
   man.Verb(0); // 0 = silent, 1 = some, 2 = every event
+  gSystem->mkdir("result", true);
 
   ///
   /// Read event file(s).
@@ -74,14 +75,14 @@ void ana_NMR_raw_signal()
   leg->AddEntry(gr_last ,  "Last point", "p");
   leg->Draw();
 
-  c1->SaveAs("gr_voltage_vs_time.png");
+  c1->SaveAs("result/gr_voltage_vs_time.png");
 
   gr_diff->SetTitle((";" + title_x + ";V_{First} - V_{Last}").c_str());
   gr_diff->GetYaxis()->SetTitleOffset(0.6);
   gr_diff->SetMarkerStyle(7);
   gr_diff->SetMarkerColor(kRed);
   gr_diff->Draw("AP");
-  c1->SaveAs("gr_diff_vs_time.png");
+  c1->SaveAs("result/gr_diff_vs_time.png");
 
   delete c1;
   exit(0);

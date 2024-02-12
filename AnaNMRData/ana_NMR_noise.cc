@@ -5,11 +5,14 @@ void ana_NMR_noise()
 {
   NMRDataManager man;
   man.Verb(0); // 0 = silent, 1 = some, 2 = every event
+  gSystem->mkdir("result", true);
 
   ///
   /// Read event file(s).
   ///
-  man.ReadEventFile("2024-02-10_18h41m29s");
+  //man.ReadEventFile("2024-02-10_18h41m29s");
+  man.ReadEventFile("2024-02-11_17h36m11s");
+
 
   int ScanSweeps; // N of sweeps per measurement
   int ScanSteps;  // N of frequency steps per scan
@@ -21,7 +24,8 @@ void ana_NMR_noise()
   ///
   /// Set the reference time.  Set 'utime0' to 0 to pick up the time of the 1st data.
   ///
-  TTimeStamp ts0(2024, 2, 9, 18, 0, 0);
+  //TTimeStamp ts0(2024, 2, 9,  18, 0, 0); // For "2024-02-10_18h41m29s"
+  TTimeStamp ts0(2024, 2, 10,  18, 0, 0); // For "2024-02-11_17h36m11s"
   int utime0 = ts0.GetSec() + TTimeStamp::GetZoneOffset();
 
   ///
@@ -96,7 +100,7 @@ void ana_NMR_noise()
   gr_noise->SetLineColor  (kRed);
   gr_noise->Draw("AP");
 
-  c1->SaveAs("gr_noise.png");
+  c1->SaveAs("result/gr_noise.png");
   delete c1;
   exit(0);
 }
@@ -115,7 +119,7 @@ void DrawPolySignal(TH2* h2_vt, const int i_evt_b, const int i_evt_e, const int 
   h2_vt->SetTitle(oss.str().c_str());
   h2_vt->Draw("colz");
   oss.str("");
-  oss << setfill('0') << "h2_vt_" << setw(6) << i_evt_b << ".png";
+  oss << setfill('0') << "result/h2_vt_" << setw(6) << i_evt_b << ".png";
   c1->SaveAs(oss.str().c_str());
   delete c1;
 }

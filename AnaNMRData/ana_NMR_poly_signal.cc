@@ -5,6 +5,7 @@ void ana_NMR_poly_signal()
 {
   NMRDataManager man;
   man.Verb(0); // 0 = silent, 1 = some, 2 = every event
+  gSystem->mkdir("result", true);
 
   ///
   /// Read event file(s).
@@ -88,7 +89,7 @@ void DrawPolySignal(TH2* h2_vt, const int i_evt_b, const int i_evt_e, const int 
   h2_vt->SetTitle(oss.str().c_str());
   h2_vt->Draw("colz");
   oss.str("");
-  oss << setfill('0') << "h2_vt_" << setw(6) << i_evt_b << ".png";
+  oss << setfill('0') << "result/h2_vt_" << setw(6) << i_evt_b << ".png";
   c1->SaveAs(oss.str().c_str());
   delete c1;
 }
