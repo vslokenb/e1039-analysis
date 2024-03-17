@@ -9,8 +9,10 @@ void ana_NMR_raw_signal()
   ///
   /// Read event file(s).
   ///
-  man.ReadEventFile("2024-02-08_19h02m57s");
-  man.ReadEventFile("2024-02-08_22h13m47s");
+  //man.ReadEventFile("2024-02-08_19h02m57s");
+  //man.ReadEventFile("2024-02-08_22h13m47s");
+  man.ReadEventFile("2024-02-12_16h05m57s");
+  //man.ReadEventFile("2024-02-13_19h58m19s");
 
   int ScanSweeps; // N of sweeps per measurement
   int ScanSteps;  // N of frequency steps per scan
@@ -21,7 +23,9 @@ void ana_NMR_raw_signal()
   ///
   /// Set the reference time.  Set 'utime0' to 0 to pick up the time of the 1st data.
   ///
-  TTimeStamp ts0(2024, 2, 8, 18, 0, 0);
+  //TTimeStamp ts0(2024, 2, 8, 18, 0, 0);
+  TTimeStamp ts0(2024, 2, 11,  18, 0, 0); // For "2024-02-12_16h05m57s"
+  //TTimeStamp ts0(2024, 2, 12,  18, 0, 0); // For "2024-02-12_16h05m57s"
   int utime0 = ts0.GetSec() + TTimeStamp::GetZoneOffset();
 
   ///
