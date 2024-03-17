@@ -15,7 +15,7 @@ fi
 echo "njobs=$njobs"
 echo "nevents=$nevents"
 
-macros=/e906/app/users/$USER/e1039-analysis/TargetSim
+macros=/exp/seaquest/app/users/$USER/e1039-analysis/TargetSim
 
 sed "s/nevents=NAN/nevents=$nevents/"             $macros/gridrun.sh > $macros/gridrun_new.sh 
 #sed -i "s/gap=NAN/gap=$gap/"                      $macros/gridrun_new.sh
@@ -42,7 +42,7 @@ do
 
   rsync -av $macros/gridrun_new.sh $work/$id/gridrun_new.sh
 
-  CMD="/e906/app/software/script/jobsub_submit_spinquest.sh"
+  CMD="/exp/seaquest/app/software/script/jobsub_submit_spinquest.sh"
   CMD+=" --expected-lifetime='medium'" # medium=8h, short=3h, long=23h
   CMD+=" -L $work/$id/log/log.txt"
   CMD+=" -f $work/input.tar.gz"

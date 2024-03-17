@@ -7,7 +7,7 @@ DIR_INST=$DIR_TOP/inst
 E1039_CORE_VERSION=pr.133 # Latest system-wide ver.
 
 source /project/ptgroup/spinquest/this-e1039.sh
-#source /e906/app/software/osg/software/e1039/this-e1039.sh
+#source /exp/seaquest/app/software/osg/software/e1039/this-e1039.sh
 export LD_LIBRARY_PATH=$DIR_INST/lib:$LD_LIBRARY_PATH
 
 function cmake-this {

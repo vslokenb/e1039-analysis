@@ -69,7 +69,7 @@ You then execute the following commands to process all events/runs.
 The `-g` option is to run jobs on the grid.
 
 ```
-source /e906/app/software/script/setup-jobsub-spinquest.sh
+source /exp/seaquest/app/software/script/setup-jobsub-spinquest.sh
 kinit
 ./run_reco.sh -g GO
 ```

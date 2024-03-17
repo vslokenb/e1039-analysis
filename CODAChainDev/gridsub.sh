@@ -58,7 +58,7 @@ do
   rsync -a $macros/gridrun.sh $local_work_dir/gridrun.sh
 
   if [ $do_sub == 1 ]; then
-    CMD="/e906/app/software/script/jobsub_submit_spinquest.sh"
+    CMD="/exp/seaquest/app/software/script/jobsub_submit_spinquest.sh"
     CMD+=" --expected-lifetime='medium'" # medium=8h, short=3h, long=23h
     CMD+=" -L $local_work_dir/log/log.txt"
     CMD+=" -f $local_work_dir/input.tar.gz"

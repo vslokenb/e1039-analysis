@@ -2,7 +2,7 @@ DIR_TOP=$(dirname $(readlink -f $BASH_SOURCE))
 DIR_BUILD=$DIR_TOP/build
 DIR_INST=$DIR_TOP/ana-inst
 
-source /e906/app/software/osg/software/e1039/this-e1039.sh
+source /exp/seaquest/app/software/osg/software/e1039/this-e1039.sh
 export LD_LIBRARY_PATH=$DIR_INST/lib:$LD_LIBRARY_PATH
 
 function cmake-this {
