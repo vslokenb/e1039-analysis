@@ -10,9 +10,9 @@ R__LOAD_LIBRARY(libg4testbench)
 R__LOAD_LIBRARY(libg4eval)
 R__LOAD_LIBRARY(libg4dst)
 R__LOAD_LIBRARY(libdptrigger)
-//R__LOAD_LIBRARY(libembedding)
+R__LOAD_LIBRARY(libembedding)
 R__LOAD_LIBRARY(libevt_filter)
-//R__LOAD_LIBRARY(libktracker)
+R__LOAD_LIBRARY(libktracker)
 R__LOAD_LIBRARY(libSQPrimaryGen)
 using namespace std;
 
@@ -40,11 +40,11 @@ int Fun4Sim(const int nevent = 10)
   const double KMAGSTR = -1.025;
 
  //! particle generator flag
-  const bool gen_pythia8  = true; // false;
+  const bool gen_pythia8  = false;
   const bool gen_cosmic   = false;
   const bool gen_particle = false;
   const bool read_hepmc   = false;
-  const bool gen_e906legacy = false; // cf. SQPrimaryParticleGen
+  const bool gen_e906legacy = true; // cf. SQPrimaryParticleGen
 
   //! Use SQPrimaryVertexGen or not.
   const bool SQ_vtx_gen = true;
@@ -181,7 +181,7 @@ int Fun4Sim(const int nevent = 10)
 
     if(drellyan_gen){
       e906legacy->set_xfRange(0.1, 0.5); //[-1.,1.]
-      e906legacy->set_massRange(0.23, 10.0);// 0.22 and above     
+      e906legacy->set_massRange(3.0, 10.0);
       e906legacy->enableDrellYanGen();
     }
    
@@ -250,27 +250,27 @@ int Fun4Sim(const int nevent = 10)
   se->registerSubsystem(digitizer);
 
   /// Save only events that are in the geometric acceptance.
-  //SQGeomAcc* geom_acc = new SQGeomAcc();
-  //geom_acc->SetMuonMode(SQGeomAcc::PAIR); // PAIR, PAIR_TBBT, SINGLE, SINGLE_T, etc.
-  //geom_acc->SetPlaneMode(SQGeomAcc::HODO_CHAM); // HODO, CHAM or HODO_CHAM
-  //geom_acc->SetNumOfH1EdgeElementsExcluded(4); // Exclude 4 elements at H1 edges
-  //se->registerSubsystem(geom_acc);
+  SQGeomAcc* geom_acc = new SQGeomAcc();
+  geom_acc->SetMuonMode(SQGeomAcc::PAIR); // PAIR, PAIR_TBBT, SINGLE, SINGLE_T, etc.
+  geom_acc->SetPlaneMode(SQGeomAcc::HODO_CHAM); // HODO, CHAM or HODO_CHAM
+  geom_acc->SetNumOfH1EdgeElementsExcluded(4); // Exclude 4 elements at H1 edges
+  se->registerSubsystem(geom_acc);
 
   // Make SQ nodes for truth info
   se->registerSubsystem(new TruthNodeMaker());
 
   // embedding
-//  if(embedding_opt == 1) {
-//    SRawEventEmbed *embed = new SRawEventEmbed("SRawEventEmbed");
-//    embed->set_in_name("digit_016070_R007.root");
-//    embed->set_in_tree_name("save");
-//    embed->set_trigger_bit((1<<0));
-//    //embed->set_in_name("random_run3a_1.root");
-//    //embed->set_in_tree_name("mb");
-//    //embed->set_trigger_bit((1<<7));
-//    embed->Verbosity(0);
-//    se->registerSubsystem(embed);
-//  }
+  if(embedding_opt == 1) {
+    SRawEventEmbed *embed = new SRawEventEmbed("SRawEventEmbed");
+    embed->set_in_name("digit_016070_R007.root");
+    embed->set_in_tree_name("save");
+    embed->set_trigger_bit((1<<0));
+    //embed->set_in_name("random_run3a_1.root");
+    //embed->set_in_tree_name("mb");
+    //embed->set_trigger_bit((1<<7));
+    embed->Verbosity(0);
+    se->registerSubsystem(embed);
+  }
 
   // Trigger Emulator
   DPTriggerAnalyzer* dptrigger = new DPTriggerAnalyzer();
@@ -284,26 +284,26 @@ int Fun4Sim(const int nevent = 10)
   //se->registerSubsystem(evt_filter);
 
   // Tracking module
-//  SQReco* reco = new SQReco();
-//  reco->Verbosity(0);
-//  //reco->set_geom_file_name("support/geom.root"); //not needed as it's created on the fly
-//  reco->set_enable_KF(true);           //Kalman filter not needed for the track finding, disabling KF saves a lot of initialization time
-//  reco->setInputTy(SQReco::E1039);     //options are SQReco::E906 and SQReco::E1039
-//  reco->setFitterTy(SQReco::KFREF);    //not relavant for the track finding
-//  reco->set_evt_reducer_opt("none");   //if not provided, event reducer will be using JobOptsSvc to intialize; to turn off, set it to "none", for normal tracking, set to something like "aoc"
-//  reco->set_enable_eval(true);          //set to true to generate evaluation file which includes final track candidates 
-//  reco->set_eval_file_name("eval.root");
-//  reco->set_enable_eval_dst(false);     //set to true to include final track cnadidates in the DST tree
-//  if(gen_cosmic) reco->add_eval_list(3);    //output of cosmic reco is contained in the eval output for now
-//  //reco->add_eval_list(3);             //include back partial tracks in eval tree for debuging
-//  //reco->add_eval_list(2);             //include station-3+/- in eval tree for debuging
-//  //reco->add_eval_list(1);             //include station-2 in eval tree for debugging
-//  se->registerSubsystem(reco);
-//
-//  VertexFit* vertexing = new VertexFit();
-//  //vertexing->enable_fit_target_center(); //uncomment if you want to fit in the target center
-//  //vertexing->enableOptimization(); //uncomment if you want to fit according to new optimization formula
-//  se->registerSubsystem(vertexing);
+  SQReco* reco = new SQReco();
+  reco->Verbosity(0);
+  //reco->set_geom_file_name("support/geom.root"); //not needed as it's created on the fly
+  reco->set_enable_KF(true);           //Kalman filter not needed for the track finding, disabling KF saves a lot of initialization time
+  reco->setInputTy(SQReco::E1039);     //options are SQReco::E906 and SQReco::E1039
+  reco->setFitterTy(SQReco::KFREF);    //not relavant for the track finding
+  reco->set_evt_reducer_opt("none");   //if not provided, event reducer will be using JobOptsSvc to intialize; to turn off, set it to "none", for normal tracking, set to something like "aoc"
+  reco->set_enable_eval(true);          //set to true to generate evaluation file which includes final track candidates 
+  reco->set_eval_file_name("eval.root");
+  reco->set_enable_eval_dst(false);     //set to true to include final track cnadidates in the DST tree
+  if(gen_cosmic) reco->add_eval_list(3);    //output of cosmic reco is contained in the eval output for now
+  //reco->add_eval_list(3);             //include back partial tracks in eval tree for debuging
+  //reco->add_eval_list(2);             //include station-3+/- in eval tree for debuging
+  //reco->add_eval_list(1);             //include station-2 in eval tree for debugging
+  se->registerSubsystem(reco);
+
+  VertexFit* vertexing = new VertexFit();
+  //vertexing->enable_fit_target_center(); //uncomment if you want to fit in the target center
+  //vertexing->enableOptimization(); //uncomment if you want to fit according to new optimization formula
+  se->registerSubsystem(vertexing);
 
   //// Trim minor data nodes (to reduce the DST file size)
   //se->registerSubsystem(new SimDstTrimmer());
@@ -334,7 +334,7 @@ int Fun4Sim(const int nevent = 10)
   //  se->registerOutputManager(out);
   //}
 
-  const bool count_only_good_events = false;
+  const bool count_only_good_events = true;
   se->run(nevent, count_only_good_events);
 
   PHGeomUtility::ExportGeomtry(se->topNode(),"geom.root");
