@@ -37,8 +37,8 @@ int AnaSimDst::InitRun(PHCompositeNode* topNode)
   mo_file = new TFile("sim_tree.root", "RECREATE");
   mo_tree = new TTree("tree", "Created by AnaSimDst");
   mo_tree->Branch("evt"     , &mo_evt);
-  //mo_tree->Branch("trk_true", &mo_trk_true);
-  //mo_tree->Branch("trk_reco", &mo_trk_reco);
+  mo_tree->Branch("trk_true", &mo_trk_true);
+  mo_tree->Branch("trk_reco", &mo_trk_reco);
   mo_tree->Branch("dim_true", &mo_dim_true);
   mo_tree->Branch("dim_reco", &mo_dim_reco);
 
@@ -74,29 +74,29 @@ int AnaSimDst::process_event(PHCompositeNode* topNode)
   ///
   /// Track info
   ///
-  //IdMap_t id_trk_t2r;
-  //if (mi_srec) FindTrackRelation(id_trk_t2r);
-  //mo_trk_true.clear();
-  //mo_trk_reco.clear();
-  //for (unsigned int ii = 0; ii < mi_vec_trk->size(); ii++) {
-  //  SQTrack* trk = &mi_vec_trk->at(ii);
-  //  TrackData td;
-  //  td.charge  = trk->get_charge();
-  //  td.pos_vtx = trk->get_pos_vtx();
-  //  td.mom_vtx = trk->get_mom_vtx();
-  //  mo_trk_true.push_back(td);
-  //
-  //  if (mi_srec) {
-  //    TrackData tdr;
-  //    if (id_trk_t2r[ii] >= 0) {
-  //      SRecTrack* trk_reco = &mi_srec->getTrack(id_trk_t2r[ii]);
-  //      tdr.charge  = trk_reco->getCharge();
-  //      tdr.pos_vtx = trk_reco->getVertex();
-  //      tdr.mom_vtx = trk_reco->getMomentumVertex();
-  //    }
-  //    mo_trk_reco.push_back(tdr);
-  //  }
-  //}
+  IdMap_t id_trk_t2r;
+  if (mi_srec) FindTrackRelation(id_trk_t2r);
+  mo_trk_true.clear();
+  mo_trk_reco.clear();
+  for (unsigned int ii = 0; ii < mi_vec_trk->size(); ii++) {
+    SQTrack* trk = mi_vec_trk->at(ii);
+    TrackData td;
+    td.charge  = trk->get_charge();
+    td.pos_vtx = trk->get_pos_vtx();
+    td.mom_vtx = trk->get_mom_vtx();
+    mo_trk_true.push_back(td);
+  
+    if (mi_srec) {
+      TrackData tdr;
+      if (id_trk_t2r[ii] >= 0) {
+        SRecTrack* trk_reco = &mi_srec->getTrack(id_trk_t2r[ii]);
+        tdr.charge  = trk_reco->getCharge();
+        tdr.pos_vtx = trk_reco->getVertex();
+        tdr.mom_vtx = trk_reco->getMomentumVertex();
+      }
+      mo_trk_reco.push_back(tdr);
+    }
+  }
 
   ///
   /// Dimuon info
