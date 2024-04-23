@@ -39,18 +39,18 @@ int Fun4Sim(const int nevent = 10)
   const double FMAGSTR = -1.044;
   const double KMAGSTR = -1.025;
 
- //! particle generator flag
-  const bool gen_pythia8  = false;
+ //! Particle generator flag.  Only one of these must be true.
+  const bool gen_pythia8  = true;
   const bool gen_cosmic   = false;
   const bool gen_particle = false;
   const bool read_hepmc   = false;
-  const bool gen_e906legacy = true; // cf. SQPrimaryParticleGen
+  const bool gen_e906dim = false; // cf. SQPrimaryParticleGen
 
   //! Use SQPrimaryVertexGen or not.
   const bool SQ_vtx_gen = true;
   
   recoConsts *rc = recoConsts::instance();
-  rc->set_IntFlag("RUNNUMBER", 4453);
+  rc->set_IntFlag("RUNNUMBER", 4453); /// The geometry is selected based on run number.
   rc->set_DoubleFlag("FMAGSTR", FMAGSTR);
   rc->set_DoubleFlag("KMAGSTR", KMAGSTR);
   rc->set_DoubleFlag("SIGX_BEAM", 0.3);
@@ -172,9 +172,8 @@ int Fun4Sim(const int nevent = 10)
   }
 
   // E906LegacyGen
-  if(gen_e906legacy){
+  if(gen_e906dim){
     SQPrimaryParticleGen *e906legacy = new  SQPrimaryParticleGen();
-    
     const bool pythia_gen = false;
     const bool drellyan_gen = true;
     const bool JPsi_gen = false;
@@ -185,18 +184,14 @@ int Fun4Sim(const int nevent = 10)
       e906legacy->set_massRange(3.0, 10.0);
       e906legacy->enableDrellYanGen();
     }
-   
     if(Psip_gen){ 
       e906legacy->set_xfRange(0.1, 0.5); //[-1.,1.]
       e906legacy->enablePsipGen();
     }
-
-
     if(JPsi_gen){
       e906legacy->set_xfRange(0.1, 0.5); //[-1.,1.]
       e906legacy->enableJPsiGen();
     }
-    
     if(pythia_gen){ 
       e906legacy->enablePythia();
       e906legacy->set_config_file("phpythia8_DY.cfg");
@@ -251,11 +246,11 @@ int Fun4Sim(const int nevent = 10)
   se->registerSubsystem(digitizer);
 
   /// Save only events that are in the geometric acceptance.
-  SQGeomAcc* geom_acc = new SQGeomAcc();
-  geom_acc->SetMuonMode(SQGeomAcc::PAIR); // PAIR, PAIR_TBBT, SINGLE, SINGLE_T, etc.
-  geom_acc->SetPlaneMode(SQGeomAcc::HODO_CHAM); // HODO, CHAM or HODO_CHAM
-  geom_acc->SetNumOfH1EdgeElementsExcluded(4); // Exclude 4 elements at H1 edges
-  se->registerSubsystem(geom_acc);
+  //SQGeomAcc* geom_acc = new SQGeomAcc();
+  //geom_acc->SetMuonMode(SQGeomAcc::PAIR); // PAIR, PAIR_TBBT, SINGLE, SINGLE_T, etc.
+  //geom_acc->SetPlaneMode(SQGeomAcc::HODO_CHAM); // HODO, CHAM or HODO_CHAM
+  //geom_acc->SetNumOfH1EdgeElementsExcluded(4); // Exclude 4 elements at H1 edges
+  //se->registerSubsystem(geom_acc);
 
   // Make SQ nodes for truth info
   se->registerSubsystem(new TruthNodeMaker());
@@ -335,7 +330,7 @@ int Fun4Sim(const int nevent = 10)
   //  se->registerOutputManager(out);
   //}
 
-  const bool count_only_good_events = true;
+  const bool count_only_good_events = false;
   se->run(nevent, count_only_good_events);
 
   PHGeomUtility::ExportGeomtry(se->topNode(),"geom.root");
