@@ -52,8 +52,6 @@ if [ ${HOSTNAME:0:13} != 'spinquestgpvm' ] ; then
     echo
 fi
 
-echo "!!Note!!  The usage of this package changed on 2021-05-15."
-echo
 echo "Two commands for source build:"
 echo "  cmake-this"
 echo "  make-this"

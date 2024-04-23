@@ -1,4 +1,5 @@
 #include <iomanip>
+#include <memory>
 #include <g4main/PHG4TruthInfoContainer.h>
 #include <g4main/PHG4Particle.h>
 #include <interface_main/SQEvent.h>
