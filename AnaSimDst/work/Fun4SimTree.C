@@ -9,6 +9,7 @@ TCanvas* c1;
 double inte_lumi;
 void DrawDimTrueKin();
 void DrawDimRecoKin();
+void DrawDimTrkTrueKin();
 void DrawTrkTrueKin();
 void DrawTrueVar(const string varname, const string title_x, const int n_x, const double x_lo, const double x_hi);
 void FitCosTheta();
@@ -27,11 +28,15 @@ void Fun4SimTree(const char* fname="sim_tree.root", const char* tname="tree")
   inte_lumi = GetInteLumi();
   cout << "Integrated luminosity = " << inte_lumi << endl;
 
+  tree->Draw("rec_stat", "weight"); // cf. GlobalConsts.h.
+  c1->SaveAs("result/h1_rec_stat.png");
+
   /// You can use these functions or add new ones.
-  DrawDimTrueKin();
+  //DrawDimTrueKin();
   //DrawDimRecoKin();
-  //DrawTrkTrueKin();
-  FitCosTheta();
+  //DrawDimTrkTrueKin();
+  DrawTrkTrueKin();
+  //FitCosTheta();
   //AnaEvents();
 
   exit(0);
@@ -81,8 +86,8 @@ void DrawDimRecoKin()
   c1->SaveAs("result/h1_dim_reco_x2.png");
 }
 
-
-void DrawTrkTrueKin()
+/// Function to draw tracks of dimuons (not single tracks).
+void DrawDimTrkTrueKin()
 {
   DrawTrueVar("dim_true.mom_pos.X()", "True px (GeV) of mu+", 100, -5, 5);
   DrawTrueVar("dim_true.mom_pos.Y()", "True py (GeV) of mu+", 100, -5, 5);
@@ -105,6 +110,30 @@ void DrawTrkTrueKin()
   h1_rec->SetLineColor(kRed);
   hs->Draw("nostack");
   c1->SaveAs("result/h1_trk_true_pz_asym.png");
+}
+
+/// Function to draw single tracks.
+void DrawTrkTrueKin()
+{
+  DrawTrueVar("trk_true.charge"     , "True charge of single tracks"  ,   3, -1.5, 1.5);
+  DrawTrueVar("trk_true.mom_vtx.X()", "True px (GeV) of single tracks", 100, -5, 5);
+  DrawTrueVar("trk_true.mom_vtx.Y()", "True py (GeV) of single tracks", 100, -5, 5);
+  DrawTrueVar("trk_true.mom_vtx.Z()", "True pz (GeV) of single tracks", 100,  0, 100);
+
+  THStack* hs;
+  TH1* h1_all = new TH1D("h1_all", "", 3, -1.5, 1.5);
+  TH1* h1_rec = new TH1D("h1_rec", "", 3, -1.5, 1.5);
+  tree->Project("h1_all", "trk_true.charge", "weight");
+  tree->Project("h1_rec", "trk_true.charge", "weight * (rec_stat==0)");
+
+  ostringstream oss;
+  oss << TYPE_GMC << " GMC;True charge of single tracks;N of tracks";
+  hs = new THStack("hs", oss.str().c_str());
+  hs->Add(h1_all);
+  hs->Add(h1_rec);
+  h1_rec->SetLineColor(kRed);
+  hs->Draw("nostack");
+  c1->SaveAs("result/h1_trk_true_charge.png");
 }
 
 void DrawTrueVar(const string varname, const string title_x, const int n_x, const double x_lo, const double x_hi)
