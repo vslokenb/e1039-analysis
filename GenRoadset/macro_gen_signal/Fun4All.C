@@ -11,7 +11,7 @@ R__LOAD_LIBRARY(libSQPrimaryGen)
 R__LOAD_LIBRARY(libGenRoadset)
 using namespace std;
 
-int Fun4All(const int n_evt=0)
+int Fun4All(const int n_evt=0, const int KMag_polarity=+1)
 {
   recoConsts *rc = recoConsts::instance();
   Fun4AllServer *se = Fun4AllServer::instance();
@@ -19,8 +19,8 @@ int Fun4All(const int n_evt=0)
   ///
   /// Global parameters
   ///
-  const double FMAGSTR = -1.054;
-  const double KMAGSTR = -0.951;
+  double FMAGSTR = -1.054;
+  double KMAGSTR = -0.951 * KMag_polarity;
   rc->set_DoubleFlag("FMAGSTR", FMAGSTR);
   rc->set_DoubleFlag("KMAGSTR", KMAGSTR);
   rc->set_CharFlag("VTX_GEN_MATERIAL_MODE", "Target");
@@ -32,7 +32,7 @@ int Fun4All(const int n_evt=0)
   SQPrimaryParticleGen* sq_gen = new SQPrimaryParticleGen();
   switch (gen_switch) {
   case 1: // Drell-Yan: 500 events = 1 hour
-    sq_gen->set_massRange(1.5, 9.0);
+    sq_gen->set_massRange(.5, 9.0);
     sq_gen->set_xfRange(0.00, 0.95);
     sq_gen->enableDrellYanGen();
     break;

@@ -36,7 +36,6 @@ AnaBG::AnaBG(const std::string label)
 
 AnaBG::~AnaBG() 
 {
-  ;
 }
 
 void AnaBG::Init()
@@ -46,10 +45,36 @@ void AnaBG::Init()
     exit(1);
   }
 
+///---Added by Abi
+  int idx = 0;
+  double list_val[256];
+  int val = 0;
+  list_val[idx++] = val;
+  for (int i = 0; i < 16; i++) { val +=    1; list_val[idx++] = val; }
+  for (int i = 0; i < 20; i++) { val +=    2; list_val[idx++] = val; }
+  for (int i = 0; i < 21; i++) { val +=    4; list_val[idx++] = val; }
+  for (int i = 0; i < 20; i++) { val +=    8; list_val[idx++] = val; }
+  for (int i = 0; i < 15; i++) { val +=   16; list_val[idx++] = val; }
+  for (int i = 0; i <  1; i++) { val +=   31; list_val[idx++] = val; }
+  for (int i = 0; i <  4; i++) { val +=   16; list_val[idx++] = val; }
+  for (int i = 0; i < 21; i++) { val +=   32; list_val[idx++] = val; }
+  for (int i = 0; i < 20; i++) { val +=   64; list_val[idx++] = val; }
+  for (int i = 0; i < 20; i++) { val +=  128; list_val[idx++] = val; }
+  for (int i = 0; i < 21; i++) { val +=  256; list_val[idx++] = val; }
+  for (int i = 0; i < 20; i++) { val +=  512; list_val[idx++] = val; }
+  for (int i = 0; i < 20; i++) { val += 1024; list_val[idx++] = val; }
+  for (int i = 0; i < 21; i++) { val += 2048; list_val[idx++] = val; }
+  for (int i = 0; i <  6; i++) { val += 4096; list_val[idx++] = val; }
+///---------
+
+
   ostringstream oss;
   oss << m_dir_out << "/output.root";
   m_file_out = new TFile(oss.str().c_str(), "RECREATE");
-  m_h1_inte_max = new TH1D("h1_inte_max"  , "", 200, 0, 20e3);
+ // m_h1_inte_max = new TH1D("h1_inte_max"  , "", 200, 0, 20e3);
+  m_h1_inte_max = new TH1D("h1_inte_max"  , "", 1200, 0, 130e3);
+ // m_h1_inte = new TH1D("h1_inte"  , "Run 06 NIM3 ", idx-1,list_val);
+  m_h1_inte = new TH1D("h1_inte"  , "", 1200, 0, 1300e3);
 
   m_ofs << "Intensity cut = " << m_inte_cut << endl;
 }
@@ -75,6 +100,7 @@ void AnaBG::ReadEvents(const char* fname)
     exit(1);
   }
 
+
   tree->SetBranchAddress(m_branch_name.c_str(), &m_bg_data);
 
   for (int i_ent = 0; i_ent < tree->GetEntries(); i_ent++) {
@@ -90,7 +116,7 @@ void AnaBG::ProcessOneEvent()
   //int  run        =  m_bg_data->run;
   //int  evt        =  m_bg_data->evt;
   //bool fpga1      =  m_bg_data->fpga1;
-  //int  inte_rfp00 =  m_bg_data->inte_rfp00;
+  int  inte_rfp00 =  m_bg_data->inte_rfp00;
   int  inte_max   =  m_bg_data->inte_max;
   EleList* h1t    = &m_bg_data->h1t;
   EleList* h2t    = &m_bg_data->h2t;
@@ -101,12 +127,17 @@ void AnaBG::ProcessOneEvent()
   EleList* h3b    = &m_bg_data->h3b;
   EleList* h4b    = &m_bg_data->h4b;
 
+  m_h1_inte->Fill(inte_rfp00);
+
   if (inte_max == 0) return; // Some readout error
   m_n_evt_used++;
 
   m_h1_inte_max->Fill(inte_max);
 
-  if (m_inte_cut > 0 && inte_max >= m_inte_cut) return;
+//  if (m_inte_cut > 0 && inte_max >= m_inte_cut) return;
+
+  if(m_inte_cut > 0 && inte_rfp00 >= m_inte_cut) return; //modification by Abi
+
   if (h1t->size() == 0 || h1b->size() == 0 || 
       h2t->size() == 0 || h2b->size() == 0 || 
       h3t->size() == 0 || h3b->size() == 0 || 
@@ -219,9 +250,12 @@ void AnaBG::FindAllRoads(const EleList* h1, const EleList* h2, const EleList* h3
 
 void AnaBG::DrawInteMax()
 {
-  int bin_cut = m_h1_inte_max->FindBin(m_inte_cut) - 1;
-  double frac_acc = m_h1_inte_max->Integral(0, bin_cut) / m_h1_inte_max->Integral();
-  m_ofs << "NIM3 event fraction = " << frac_acc << " @ inte_max < " << m_inte_cut << endl;
+  //int bin_cut = m_h1_inte_max->FindBin(m_inte_cut) - 1;
+  //double frac_acc = m_h1_inte_max->Integral(0, bin_cut)*1.0 / m_h1_inte_max->Integral()*1.;
+  int bin_cut = m_h1_inte->FindBin(m_inte_cut) - 1;
+  double frac_acc = m_h1_inte->Integral(0, bin_cut)*1.0 / m_h1_inte->Integral()*1.;
+
+  m_ofs << "NIM3 event fraction = " << frac_acc << " @ inte_rfp00 < " << m_inte_cut<<" m_h1_inte_max->Integral(0, bin_cut): "<< m_h1_inte_max->Integral(0, bin_cut)<<" m_h1_inte_max->Integral(): "<<m_h1_inte_max->Integral() << endl;
 
   TCanvas* c1 = new TCanvas("c1", "");
   c1->SetGrid();

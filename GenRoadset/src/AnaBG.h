@@ -37,6 +37,7 @@ class AnaBG : public AnaBase {
   ///
   TFile* m_file_out;
   TH1* m_h1_inte_max;
+  TH1* m_h1_inte;
 
   ///
   /// Parameters

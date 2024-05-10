@@ -1,19 +1,18 @@
 R__LOAD_LIBRARY(libGenRoadset)
+#include "Common.h"
 using namespace std;
 
 /// Macro to generate a roadset based on the S/N FoM.
-void GenerateRoad(const string rs_id="113")
+void GenerateRoad()
 {
-  /// A set of roadset parameters is adjusted and recorded here.
-  double  mass_lo;
-  double  mass_hi;
+  string rs_id;
+  double mass_lo;
+  double mass_hi;
   int    inte_cut;
   double frac_cut;
-  if      (rs_id == "102") { mass_lo=4.0; mass_hi=5.0; inte_cut=1200; frac_cut=0.010; }
-  else if (rs_id == "103") { mass_lo=2.5; mass_hi=3.5; inte_cut=1200; frac_cut=0.040; }
-  else if (rs_id == "104") { mass_lo=2.5; mass_hi=3.5; inte_cut=1200; frac_cut=0.033; }
-  else if (rs_id == "105") { mass_lo=7.0; mass_hi=8.0; inte_cut=1200; frac_cut=0.010; }
-  else if (rs_id == "113") { mass_lo=2.5; mass_hi=3.5; inte_cut=1200; frac_cut=0.040; }
+  string list_sig;
+  string list_bg;
+  GetParams(rs_id, mass_lo, mass_hi, inte_cut, frac_cut, list_sig, list_bg);
 
   cout << "\nRead and analyze the signal files." << endl;
   AnaSignal* ana_sig = new AnaSignal();
@@ -21,7 +20,7 @@ void GenerateRoad(const string rs_id="113")
   ana_sig->SetInputBranchName("signal_data");
   ana_sig->SetMassRange(mass_lo, mass_hi);
   ana_sig->Init();
-  ana_sig->ReadEventsFromFileList("list_signal.txt");
+  ana_sig->ReadEventsFromFileList(list_sig.c_str());
   ana_sig->Analyze();
   ana_sig->End();
 
@@ -32,7 +31,7 @@ void GenerateRoad(const string rs_id="113")
   ana_bg->SetInteCut(inte_cut);
   ana_bg->SetRoads(ana_sig);
   ana_bg->Init();
-  ana_bg->ReadEventsFromFileList("list_bg.txt");
+  ana_bg->ReadEventsFromFileList(list_bg.c_str());
   ana_bg->Analyze();
   ana_bg->End();
 

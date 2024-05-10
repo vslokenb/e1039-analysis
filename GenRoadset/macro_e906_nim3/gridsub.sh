@@ -48,11 +48,17 @@ rm -f    $DIR_WORK/input.tar.gz
 tar czf  $DIR_WORK/input.tar.gz  *.C *.txt ../inst
 
 RUN_I=0
+
 while read DB_SERVER DB_SCHEMA RUN ROADSET ; do
+    #test $RUN -lt 25200 && continue # No good spill before run 25200 at present
     (( RUN_I++ ))
+    echo $RUN
     test $RUN_I -lt $RUN_B && continue
     test $RUN_I -gt $RUN_E && break
     test $RUN -lt 24279 && continue # No good spill before run 24279 at present
+    #echo $RUN_I
+    #test $RUN -lt 25200 && continue # No good spill before run 25200 at present
+    echo $RUN_I
     echo "----------------------------------------------------------------"
     printf "Run %6d:  %5d / %5d\n" $RUN $RUN_I $RUN_N
 

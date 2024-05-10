@@ -1,7 +1,9 @@
 #!/bin/bash
 DIR_MACRO=$(dirname $(readlink -f $BASH_SOURCE))
 
-JOB_NAME=main
+KMAG_POL=+1 # +1 or -1
+JOB_NAME=main_v2 # KMag polarity = Normal
+#JOB_NAME=main_reverse # KMag polarity = Reverse
 DO_OVERWRITE=no
 USE_GRID=no
 JOB_B=1
@@ -59,12 +61,12 @@ for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
     cp -p $DIR_MACRO/gridrun.sh $DIR_WORK_JOB
     
     if [ $USE_GRID == yes ]; then
-	CMD="/e906/app/software/script/jobsub_submit_spinquest.sh"
+	CMD="/exp/seaquest/app/software/script/jobsub_submit_spinquest.sh"
 	CMD+=" --expected-lifetime='short'" # medium=8h, short=3h, long=23h
 	CMD+=" -L $DIR_WORK_JOB/log_gridrun.txt"
 	CMD+=" -f $DIR_WORK/input.tar.gz"
 	CMD+=" -d OUTPUT $DIR_WORK_JOB/out"
-	CMD+=" file://$DIR_WORK_JOB/gridrun.sh $N_EVT"
+	CMD+=" file://$DIR_WORK_JOB/gridrun.sh $N_EVT $KMAG_POL"
 	unbuffer $CMD |& tee $DIR_WORK_JOB/log_jobsub_submit.txt
 	RET_SUB=${PIPESTATUS[0]}
 	test $RET_SUB -ne 0 && exit $RET_SUB
@@ -74,6 +76,6 @@ for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
 	mkdir -p $DIR_WORK_JOB/in
 	cp -p $DIR_WORK/input.tar.gz $DIR_WORK_JOB/in
 	cd $DIR_WORK_JOB
-	$DIR_WORK_JOB/gridrun.sh $N_EVT |& tee $DIR_WORK_JOB/log_gridrun.txt
+	$DIR_WORK_JOB/gridrun.sh $N_EVT $KMAG_POL |& tee $DIR_WORK_JOB/log_gridrun.txt
     fi
 done

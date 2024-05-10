@@ -32,13 +32,26 @@ int Fun4All(const string fname, const int n_evt=0)
     sq_gen->set_beam_intensity_profile(intensity_profile);
     break; }
   case 2: { // Histogram
-    TFile* file = new TFile("e906_rf00.root");
+/*    TFile* file = new TFile("e906_rf00.root");
     TH1D* hprof = (TH1D*)file->Get("h1_rf00");
     for (int ibin = 1; ibin <= hprof->GetNbinsX(); ++ibin) {
       hprof->SetBinContent(ibin, hprof->GetBinContent(ibin) * hprof->GetBinWidth(ibin));
     }
-    sq_gen->set_inhibit_threshold(5000);//3000-5000
-    sq_gen->set_proton_coeff(0.038);//For Run 15361-15370, thredhold = 3000 and coeff = 0.033
+
+    TFile* file = new TFile("run6nim3.root");
+    TH1D* hprof = (TH1D*)file->Get("h1_inte");
+    sq_gen->set_inhibit_threshold(200000);//3000-5000
+*/
+
+    TFile* file = new TFile("nim3pot_run6.root");
+    TH1F* hprof = (TH1F*)file->Get("h_pot_p00");
+    sq_gen->set_inhibit_threshold(1300e3);//3000-5000
+
+    //for (int ibin = 1; ibin <= hprof->GetNbinsX(); ++ibin) {
+      //hprof->SetBinContent(ibin, hprof->GetBinContent(ibin) * hprof->GetBinWidth(ibin));
+    //}
+
+    sq_gen->set_proton_coeff(1.0);//For Run 15361-15370, thredhold = 3000 and coeff = 0.033
     sq_gen->set_beam_intensity_profile_histo(hprof);
     break; }
   case 3: {// Constant

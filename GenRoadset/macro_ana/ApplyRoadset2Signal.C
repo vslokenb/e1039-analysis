@@ -1,16 +1,17 @@
 R__LOAD_LIBRARY(libGenRoadset)
+#include "Common.h"
 using namespace std;
 
-void ApplyRoadset2Signal(const string rs_id="113")
+void ApplyRoadset2Signal()
 {
-  /// You have to make these parameters identical to the ones in `GenerateRoad.C`.
-  double  mass_lo;
-  double  mass_hi;
-  if      (rs_id == "102") { mass_lo=4.0; mass_hi=5.0; }
-  else if (rs_id == "103") { mass_lo=2.5; mass_hi=3.5; }
-  else if (rs_id == "104") { mass_lo=2.5; mass_hi=3.5; }
-  else if (rs_id == "105") { mass_lo=7.0; mass_hi=8.0; }
-  else if (rs_id == "113") { mass_lo=2.5; mass_hi=3.5; }
+  string rs_id;
+  double mass_lo;
+  double mass_hi;
+  int    inte_cut;
+  double frac_cut;
+  string list_sig;
+  string list_bg;
+  GetParams(rs_id, mass_lo, mass_hi, inte_cut, frac_cut, list_sig, list_bg);
 
   ReAnaSignal* ana_sig = new ReAnaSignal("app_sig_rs" + rs_id);
   ana_sig->SetInputTreeName  ("signal_tree");
@@ -24,7 +25,7 @@ void ApplyRoadset2Signal(const string rs_id="113")
     ana_sig->GetRoadMapNegBot(), 
     rs_id
     );
-  ana_sig->ReadEventsFromFileList("list_signal.txt");
+  ana_sig->ReadEventsFromFileList(list_sig.c_str()); 
   ana_sig->Analyze();
   ana_sig->End();
 

@@ -14,9 +14,9 @@ echo "PWD    = $PWD"
 
 tar xzf $CONDOR_DIR_INPUT/input.tar.gz
 
-FN_SETUP=/e906/app/software/osg/software/e1039/this-e1039.sh
+FN_SETUP=/exp/seaquest/app/software/osg/software/e1039/this-e1039.sh
 if [ ! -e $FN_SETUP ] ; then # On grid
-    FN_SETUP=/cvmfs/seaquest.opensciencegrid.org/seaquest/${FN_SETUP#/e906/app/software/osg/}
+    FN_SETUP=/cvmfs/seaquest.opensciencegrid.org/seaquest/${FN_SETUP#/exp/seaquest/app/software/osg/}
 fi
 echo "SETUP = $FN_SETUP"
 source $FN_SETUP
@@ -30,6 +30,6 @@ if [ $RET -ne 0 ] ; then
     exit $RET
 fi
 
-mv  *.root *.tsv  $CONDOR_DIR_OUTPUT
+mv  bg_data.root *.tsv  $CONDOR_DIR_OUTPUT
 
 echo "gridrun.sh finished!"

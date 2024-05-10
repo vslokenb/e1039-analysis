@@ -1,9 +1,13 @@
 #!/bin/bash
 DIR_MACRO=$(dirname $(readlink -f $BASH_SOURCE))
 
-DIR_BKG="/pnfs/e1039/persistent/users/apun/bkg_study/e1039pythiaGen_17Nov21"
+#DIR_BKG="/pnfs/e1039/persistent/users/apun/bkg_study/e1039pythiaGen_17Nov21"
+#DIR_BKG="/pnfs/e1039/persistent/users/apun/bkg_study/e1039pythiaGen_Jan22/003"
+DIR_BKG="/pnfs/e1039/persistent/users/apun/bkg_study/fullbg_candidates/01"
 
-JOB_NAME=main
+JOB_NAME=main_01_nim3potv2 # Normal KMag polarity
+#JOB_NAME=main_01_nim3pot_reverseMag # Reverse KMag polarity #main_01_run6nim3_pcoeff025_thes70k #main_jan22_003
+
 DO_OVERWRITE=no
 USE_GRID=no
 JOB_B=1
@@ -42,7 +46,7 @@ fi
 cd $DIR_MACRO
 mkdir -p $DIR_WORK
 rm -f    $DIR_WORK/input.tar.gz
-tar czf  $DIR_WORK/input.tar.gz  *.C ../inst e906_rf00*.root
+tar czf  $DIR_WORK/input.tar.gz  *.C ../inst e906_rf00*.root nim3pot_run6.root
 
 for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
     DIR_WORK_JOB=$DIR_WORK/$(printf "%04d" $JOB_I)
@@ -57,14 +61,23 @@ for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
 	fi
     fi
 
-    FN_BKG="${JOB_I}_bkge1039_pythia_17Nov21_100M.root"
+    #FN_BKG="${JOB_I}_bkge1039_pythia_17Nov21_100M.root"
+    #FN_BKG="${JOB_I}_bkge1039_pythia_Jan22_100M.root"
+   
+    #runid=`expr $JOB_I + 1000`
+    #FN_BKG="0${runid}_bkg_100M_v1.root"  
 
+    FN_BKG=$(printf '%05i_bkg_100M_v1.root' $JOB_I)
+ 
     mkdir -p $DIR_WORK_JOB/out
     cp -p $DIR_MACRO/gridrun.sh $DIR_WORK_JOB
     
     if [ $USE_GRID == yes ]; then
-	CMD="/e906/app/software/script/jobsub_submit_spinquest.sh"
+	CMD="/exp/seaquest/app/software/script/jobsub_submit_spinquest.sh"
 	CMD+=" --expected-lifetime='medium'" # medium=8h, short=3h, long=23h
+	#CMD+=" --memory=1GB"
+	#CMD+=" --lines '+FERMIHTC_AutoRelease=True'"
+	#CMD+=" --lines '+FERMIHTC_GraceLifetime=7200' --lines '+FERMIHTC_GraceMemory=2048'" #2 hours of grace lifetime and 2 GB of grace memory if hold
 	CMD+=" -L $DIR_WORK_JOB/log_gridrun.txt"
 	CMD+=" -f $DIR_WORK/input.tar.gz"
 	CMD+=" -f $DIR_BKG/$FN_BKG"

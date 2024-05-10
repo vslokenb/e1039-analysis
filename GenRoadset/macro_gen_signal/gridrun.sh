@@ -1,6 +1,7 @@
 #!/bin/bash
 
 N_EVT=$1
+KMAG_POL=$2 # +1 or -1
 
 if [ -z "$CONDOR_DIR_INPUT" -o -z "$CONDOR_DIR_OUTPUT" ] ; then
     echo "!ERROR!  CONDOR_DIR_INPUT/OUTPUT is undefined.  Abort."
@@ -13,16 +14,16 @@ echo "PWD    = $PWD"
 
 tar xzf $CONDOR_DIR_INPUT/input.tar.gz
 
-FN_SETUP=/e906/app/software/osg/software/e1039/this-e1039.sh
+FN_SETUP=/exp/seaquest/app/software/osg/software/e1039/this-e1039.sh
 if [ ! -e $FN_SETUP ] ; then # On grid
-    FN_SETUP=/cvmfs/seaquest.opensciencegrid.org/seaquest/${FN_SETUP#/e906/app/software/osg/}
+    FN_SETUP=/cvmfs/seaquest.opensciencegrid.org/seaquest/${FN_SETUP#/exp/seaquest/app/software/osg/}
 fi
 echo "SETUP = $FN_SETUP"
 source $FN_SETUP
 export   LD_LIBRARY_PATH=inst/lib:$LD_LIBRARY_PATH
 export ROOT_INCLUDE_PATH=inst/include:$ROOT_INCLUDE_PATH
 
-time root -b -q "Fun4All.C($N_EVT)"
+time root -b -q "Fun4All.C($N_EVT, $KMAG_POL)"
 RET=$?
 if [ $RET -ne 0 ] ; then
     echo "Error in Fun4All.C: $RET"
