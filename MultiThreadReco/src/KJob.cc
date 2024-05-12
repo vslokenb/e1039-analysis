@@ -1,10 +1,8 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
-//#include <phool/recoConsts.h>
-//#include <TCanvas.h>
-//#include <TGraphErrors.h>
-//#include <ktracker/KalmanFastTrackletting.h>
+#include <ktracker/SRawEvent.h>
+#include <ktracker/SRecEvent.h>
 #include "KScheduler.h"
 #include "KJob.h"
 

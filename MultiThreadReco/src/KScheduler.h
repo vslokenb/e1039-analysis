@@ -1,26 +1,15 @@
 /*
  * KScheduler.h
- *
- * also includes implementation of KJob
- * 
  * Author: Noah Wuerfel, nwuerfel@umich.edu
  * Created: 10-19-2020
- * AP AP AP AP
- *
- *
  */
-
 #ifndef _KSCHEDULER_H_
 #define _KSCHEDULER_H_
-
-#include <GlobalConsts.h>
-#include <geom_svc/GeomSvc.h>
 
 #include <list>
 #include <map>
 #include <queue>
 #include <new>
-
 #include <TString.h>
 #include <TRandom.h>
 #include <TClonesArray.h>
@@ -29,14 +18,14 @@
 #include <TSemaphore.h>
 #include <TMutex.h>
 #include <TCondition.h>
-
+#include <GlobalConsts.h>
+#include <geom_svc/GeomSvc.h>
 #include <ktracker/EventReducer.h>
 #include <ktracker/SRawEvent.h>
 #include <ktracker/TriggerAnalyzer.h>
 #include <ktracker/KalmanFastTracking.h>
 #include <ktracker/UtilSRawEvent.h>
 #include <ktracker/GFFitter.h>
-
 
 #define NTHREADS 16 // later make JobOpt
 #define INPUT_PIPE_DEPTH 32 // play with iobuffer to load memory vs do computation...

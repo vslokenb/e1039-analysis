@@ -1,46 +1,22 @@
 #ifndef _KJOB_H_
 #define _KJOB_H_
-
-#include <GlobalConsts.h>
-#include <geom_svc/GeomSvc.h>
-
 #include <list>
 #include <map>
 #include <queue>
 #include <new>
-
-#include <TString.h>
-#include <TRandom.h>
 #include <TClonesArray.h>
 #include <TStopwatch.h>
 #include <TThread.h>
 #include <TSemaphore.h>
 #include <TMutex.h>
 #include <TCondition.h>
-
-#include <ktracker/EventReducer.h>
-#include <ktracker/SRawEvent.h>
-#include <ktracker/TriggerAnalyzer.h>
-#include <ktracker/KalmanFastTracking.h>
-#include <ktracker/UtilSRawEvent.h>
-
-//#include <interface_main/SQHit.h>
-//#include <interface_main/SQHit_v1.h>
-//#include <interface_main/SQHitMap_v1.h>
-//#include <interface_main/SQHitVector_v1.h>
-//#include <interface_main/SQEvent_v1.h>
-//#include <interface_main/SQRun_v1.h>
-//#include <interface_main/SQSpill_v1.h>
-//#include <interface_main/SQSpillMap_v1.h>
-//#include <interface_main/SQTrackVector_v1.h>
+#include <GlobalConsts.h>
+class SRawEvent;
+class SRecEvent;
+class KScheduler;
 
 enum KJobStatus {STARTED, RUNNING, HALTED, COMPLETE};
 enum KJobQueueStatus {UNINITIALIZED, INITIALIZED, OPEN, FULL};
-
-class KScheduler;
-//class SQEvent;
-//class SQHitMap;
-//class SQHitVector;
 
 class KJob {
     static int verb;

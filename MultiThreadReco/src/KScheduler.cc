@@ -1,33 +1,17 @@
 /*
  * KScheduler.cxx
- *
  * Scheduler for KEventJobs in the KJobQueue
- *
  * Author: Noah Wuerfel, nwuerfel@umich.edu
- * ~ AP AP AP AP ~
  * created: 10/14/2020
- *
  */
-
 #include <iostream>
 #include <algorithm>
 #include <cmath>
-//#include <TCanvas.h>
-//#include <TGraphErrors.h>
-//#include <interface_main/SQHit.h>
-//#include <interface_main/SQHit_v1.h>
-//#include <interface_main/SQHitMap_v1.h>
-//#include <interface_main/SQHitVector_v1.h>
 #include <interface_main/SQHitVector.h>
 #include <interface_main/SQEvent.h>
 #include <interface_main/SQRun.h>
 #include <interface_main/SQSpillMap.h>
 #include <interface_main/SQTrackVector.h>
-//#include <interface_main/SQEvent_v1.h>
-//#include <interface_main/SQRun_v1.h>
-//#include <interface_main/SQSpill_v1.h>
-//#include <interface_main/SQSpillMap_v1.h>
-//#include <interface_main/SQTrackVector_v1.h>
 #include <phool/recoConsts.h>
 #include <phfield/PHFieldConfig_v3.h>
 #include <phfield/PHFieldUtility.h>
@@ -182,7 +166,6 @@ KScheduler::~KScheduler(){
         delete jobMutexArr[i];
     }
     */
-
     
     delete fRDPtr;
     fRDPtr = 0;
@@ -304,45 +287,6 @@ KScheduler::~KScheduler(){
     return;
 }
 
-/*
-void TStopwatch::Print(Option_t *opt) const
- {
-    Double_t  realt = const_cast<TStopwatch*>(this)->RealTime();
-    Double_t  cput  = const_cast<TStopwatch*>(this)->CpuTime();
- 
-    Int_t  hours = Int_t(realt / 3600);
-    realt -= hours * 3600;
-    Int_t  min   = Int_t(realt / 60);
-    realt -= min * 60;
-    Int_t  sec   = Int_t(realt);
- 
-    if (realt < 0) realt = 0;
-    if (cput  < 0) cput  = 0;
- 
-    if (opt && *opt == 'm') {
-       if (Counter() > 1) {
-          Printf("Real time %d:%02d:%06.3f, CP time %.3f, %d slices", hours, min, realt, cput, Counter());
-       } else {
-          Printf("Real time %d:%02d:%06.3f, CP time %.3f", hours, min, realt, cput);
-       }
-    } else if (opt && *opt == 'u') {
-       if (Counter() > 1) {
-          Printf("Real time %d:%02d:%09.6f, CP time %.3f, %d slices", hours, min, realt, cput, Counter());
-       } else {
-          Printf("Real time %d:%02d:%09.6f, CP time %.3f", hours, min, realt, cput);
-       }
-    } else {
-       if (Counter() > 1) {
-          Printf("Real time %d:%02d:%02d, CP time %.3f, %d slices", hours, min, sec, cput, Counter());
-       } else {
-          Printf("Real time %d:%02d:%02d, CP time %.3f", hours, min, sec, cput);
-       }
-    }
- }
-*/
-
-
-
 Int_t KScheduler::runThreads(){
     Int_t ret; 
     std::cout << "KScheduler spawning threads..." << std::endl;
@@ -404,17 +348,6 @@ void KScheduler::postCompletedEvent(){
     }
     completedEvents++;
 };
-
-// junk...
-/*
- * _m_hitID_idx
- * _m_trghitID_idx
- * _event_header
- * _event
- * _spill_map
- * _triggerhit_vector
- * _hit_vector
- */
 
 // allocates memory for KJOBs - need to delete them in reaperThread
 /**
@@ -678,20 +611,6 @@ void* KScheduler::fReaperThread(void* reaperArg){
     return 0;
 }
 
-//bool KScheduler::acceptEvent(SRawEvent* rawEvent)
-//{
-////TODO GO BACK TO NO DEBUG - nwuerfel 12/9/20
-////#ifdef _DEBUG_ON
-//  //int eventID = rawEvent->getEventID();
-//    if(rawEvent->getNHitsInD0() > 70) return false;
-//    if(rawEvent->getNHitsInD1() > 70) return false;
-//    if(rawEvent->getNHitsInD2() > 34) return false;
-//    if(rawEvent->getNHitsInD3p() > 28) return false;
-//    if(rawEvent->getNHitsInD3m() > 28) return false;
-//
-//    return true;
-//}
-
 // need to delete the memory for the worker thread for now
 void* KScheduler::fWorkerThread(void* wArgPtr)
 {
@@ -874,7 +793,6 @@ void* KScheduler::fWorkerThread(void* wArgPtr)
     delete dwArgPtr;
     return 0;
 }
-
 
 // takes mem for thred
 //Int_t KScheduler::startReaderThread(){
