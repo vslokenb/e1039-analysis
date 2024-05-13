@@ -32,6 +32,9 @@ struct workerArg{
 // need static to acess via the member threads because pthreads are typically
 // static code
 int KScheduler::verb = 0;
+int KScheduler::n_threads = 16;
+int KScheduler::input_pipe_depth  = 32; // play with iobuffer to load memory vs do computation...
+int KScheduler::output_pipe_depth = 32;
 int KScheduler::print_freq = 100; // num events per timeupdate TODO post fraction need update from fReaderThread
 int KScheduler::save_num = 5000;
 bool KScheduler::save_raw_evt = false;
@@ -41,15 +44,9 @@ TString KScheduler::inputFilename="";
 TString KScheduler::outputFilename="";
 int KScheduler::completedEvents = 0;
 
-// TODO INCLUDE IBUFFLEN AND NTHREADS IN OPTS
 KScheduler::KScheduler(TString inFile, TString outFile) 
   : use_tracklet_reco(false)
 {
-    // I/O managed by fReader and fReaper
-    //this->setInputFilename( p_jobOptsSvc->m_inputFile );
-    //this->setOutputFilename( p_jobOptsSvc->m_outputFile );
-
-    //take as args now...
     this->setInputFilename(inFile);
     this->setOutputFilename(outFile);
 }
@@ -66,7 +63,7 @@ void KScheduler::Init(PHField* phfield, TGeoManager* t_geo_manager, KalmanFitter
 
     //Initialize event reducer
     string evt_red_opt = rc->get_CharFlag("EventReduceOpts");
-    for (int i = 0; i < NEVENT_REDUCERS; i++) {
+    for (int i = 0; i < n_threads; i++) {
       EventReducer* eventReducer = 0;
       if (evt_red_opt != "none") {
         eventReducer = new EventReducer(evt_red_opt);
@@ -77,7 +74,7 @@ void KScheduler::Init(PHField* phfield, TGeoManager* t_geo_manager, KalmanFitter
 
     //Initialize the kfasttrackers
     KalmanFastTracking* kFastTracker = 0;
-    for (int i = 0; i < NKFAST_TRACKERS; i++) {
+    for (int i = 0; i < n_threads; i++) {
         if (! use_tracklet_reco) kFastTracker = new KalmanFastTracking    (phfield, t_geo_manager, false);
         else                     kFastTracker = new KalmanFastTrackletting(phfield, t_geo_manager, false);
         assert(kFastTracker);
@@ -89,7 +86,7 @@ void KScheduler::Init(PHField* phfield, TGeoManager* t_geo_manager, KalmanFitter
 
     // build TClonesArrays for tracklet outputs
     TClonesArray* trackletArray = 0;
-    for (int i = 0; i < NTHREADS; i++) {
+    for (int i = 0; i < n_threads; i++) {
         trackletArray= new TClonesArray("Tracklet",1000);
         trackletArray->BypassStreamer();
         assert(trackletArray);
@@ -97,9 +94,7 @@ void KScheduler::Init(PHField* phfield, TGeoManager* t_geo_manager, KalmanFitter
     }
 
     // worker threads
-    for(int i = 0; i < NTHREADS; i++) {
-        workThreadArr[i] = 0;
-    }
+    workThreadArr.resize(n_threads, 0);
 
     // net time for alljobs
     avgTimer = new TStopwatch();
@@ -130,23 +125,23 @@ void KScheduler::Init(PHField* phfield, TGeoManager* t_geo_manager, KalmanFitter
    
 //    jobSem = new TSemaphore(MAXJOBS);
     njqFSem = new TSemaphore(0);
-    njqESem = new TSemaphore(INPUT_PIPE_DEPTH);
+    njqESem = new TSemaphore(input_pipe_depth);
 
     // evReducer
-    erqFSem = new TSemaphore(NEVENT_REDUCERS);
+    erqFSem = new TSemaphore(n_threads);
     erqESem = new TSemaphore(0);
 
     // finder
-    kftqFSem = new TSemaphore(NKFAST_TRACKERS);
+    kftqFSem = new TSemaphore(n_threads);
     kftqESem = new TSemaphore(0);
 
     // trackletArrays
-    ktrkqFSem = new TSemaphore(NTHREADS);
+    ktrkqFSem = new TSemaphore(n_threads);
     ktrkqESem = new TSemaphore(0);
 
     // output-stage pipeline
     cjqFSem = new TSemaphore(0);
-    cjqESem = new TSemaphore(OUTPUT_PIPE_DEPTH);
+    cjqESem = new TSemaphore(output_pipe_depth);
 
     // inits TThreads to 0
     fRDPtr = 0;
@@ -162,7 +157,7 @@ KScheduler::~KScheduler(){
 
     //TODO kill remaning threads and clean memory for them
     /*
-    for(int i = 0; i<NTHREADS; i++){
+    for(int i = 0; i<n_threads; i++){
         delete jobMutexArr[i];
     }
     */
@@ -171,7 +166,7 @@ KScheduler::~KScheduler(){
     fRDPtr = 0;
     delete fRPPtr;
     fRPPtr = 0;
-    for(i=0;i<NTHREADS;i++){
+    for(i=0;i<n_threads;i++){
         assert(workThreadArr[i]);
         delete workThreadArr[i];
         workThreadArr[i]=0;
@@ -189,7 +184,7 @@ KScheduler::~KScheduler(){
     delete evRedQueueTakeMutex;
     // TODO CLEAN UP EVENTREDUCERS
     EventReducer* er = 0;
-    for(i=0;i<NEVENT_REDUCERS;i++){
+    for(i=0;i<n_threads;i++){
         er = eventReducerQueue.front(); 
         eventReducerQueue.pop();
         delete er;
@@ -201,14 +196,14 @@ KScheduler::~KScheduler(){
     delete kFTrkQueueTakeMutex;
 
     KalmanFastTracking* ft = 0;
-    for(i=0; i<NKFAST_TRACKERS; i++){
+    for(i=0; i<n_threads; i++){
         ft = kFastTrkQueue.front();
         kFastTrkQueue.pop();
         delete ft;
     }
 
     TClonesArray* trkArr= 0;
-    for(i=0; i<NTHREADS; i++){
+    for(i=0; i<n_threads; i++){
         trkArr = kTrackArrQueue.front();
         assert(trkArr);
         kTrackArrQueue.pop();
@@ -302,21 +297,20 @@ Int_t KScheduler::runThreads(){
     return 0;
 }
 
-Int_t KScheduler::endThreads(){
-    // wait for threads to finish
-    TThread::Join(fRDPtr->GetId(),NULL);
-    delete fRDPtr;
-    fRDPtr = 0;
-    TThread::Join(fRPPtr->GetId(),NULL);
-    delete fRPPtr;
-    fRPPtr = 0;
-    TThread* wPtr = 0;
-    for (int i=0; i < NTHREADS; i++) {
-        wPtr = workThreadArr[i];
-        TThread::Join(wPtr->GetId(),NULL);
-    }
-
-    return 0;
+Int_t KScheduler::endThreads()
+{
+  //TThread::Join(fRDPtr->GetId(),NULL);
+  //delete fRDPtr;
+  //fRDPtr = 0;
+  TThread::Join(fRPPtr->GetId(),NULL);
+  delete fRPPtr;
+  fRPPtr = 0;
+  TThread* wPtr = 0;
+  for (int i=0; i < n_threads; i++) {
+    wPtr = workThreadArr[i];
+    TThread::Join(wPtr->GetId(),NULL);
+  }
+  return 0;
 }
 
 // static getters and setters
@@ -435,7 +429,7 @@ void KScheduler::postCompletedEvent(){
 //
 //    TThread::Printf("fReaderThread: finished reading all events... dumping poison...");
 //
-//    for(i=0;i<NTHREADS;i++){
+//    for(i=0;i<n_threads;i++){
 //        if(Verbose() > 0){
 //            TThread::Printf("poisoning...");
 //        }
@@ -466,10 +460,8 @@ void KScheduler::PushEvent(SRawEvent* sraw, bool copy)
 void KScheduler::PushPoison()
 {
   TThread::Printf("fReaderThread: finished reading all events... dumping poison...");
-  for (int i = 0; i < NTHREADS; i++) {
-    if(Verbose() > 1){
-      TThread::Printf("poisoning...");
-    }
+  for (int i = 0; i < n_threads; i++) {
+    if(Verbose() > 2) TThread::Printf("  poisoning...");
     KJob* newKJobPtr = new KJob(true);
     njqESem->Wait();
     newJobQueuePutMutex->Lock();
@@ -512,7 +504,6 @@ void* KScheduler::fReaperThread(void* reaperArg){
     int poisonPills = 0;
     bool running = true;
     while(running){
-
         // try to acquire a job from the queue...
         kschd->cjqFSem->Wait();
         kschd->cmpJobQueuePutMutex->Lock();
@@ -523,21 +514,18 @@ void* KScheduler::fReaperThread(void* reaperArg){
 
         // check for poison
         if(tCompleteJobPtr->isPoison){
-            // cleanup job and die... 
-            if(Verbose() > 0){
-                TThread::Printf("ReaperThread got poison pill...");
-            }
-            delete tCompleteJobPtr;
-            poisonPills++;
-            if(poisonPills == NTHREADS){
-                TThread::Printf("caught all pills...");
-                break;
-            }
-            else{
-                continue;
-            }
+          // cleanup job and die... 
+          if(Verbose() > 0) TThread::Printf("ReaperThread got a poison pill...");
+          delete tCompleteJobPtr;
+          poisonPills++;
+          if (poisonPills == n_threads) {
+            TThread::Printf("ReaperThread caught all pills...");
+            break;
+          } else {
+            continue;
+          }
         }
-
+        
         // check for halted thread
         if(tCompleteJobPtr->p_JobStatus==HALTED){
            // job failed for some reason... 
@@ -597,8 +585,7 @@ void* KScheduler::fReaperThread(void* reaperArg){
         kschd->postCompletedEvent();
     }
 
-
-    TThread::Printf("fReaper attempting to save tree");
+    TThread::Printf("ReaperThread attempting to save tree");
     // save outputs
     saveTree->AutoSave("SaveSelf");
     saveFile->cd();
@@ -643,14 +630,15 @@ void* KScheduler::fWorkerThread(void* wArgPtr)
 
         // TODO check for poison pill
         if(tCompleteJobPtr->isPoison){
-            running = false;
-            //put job in complete queue to kill next part of pipeline
-            kschd->cjqESem->Wait();
-            kschd->cmpJobQueuePutMutex->Lock();
-            kschd->cmpJobQueue.push(tCompleteJobPtr);
-            kschd->cmpJobQueuePutMutex->UnLock();
-            kschd->cjqFSem->Post();
-            break;
+          if(Verbose() > 1) TThread::Printf("WorkerThread got a poison pill...");
+          running = false;
+          //put job in complete queue to kill next part of pipeline
+          kschd->cjqESem->Wait();
+          kschd->cmpJobQueuePutMutex->Lock();
+          kschd->cmpJobQueue.push(tCompleteJobPtr);
+          kschd->cmpJobQueuePutMutex->UnLock();
+          kschd->cjqFSem->Post();
+          break;
         }
        
         // check poison stream so no crash
@@ -873,7 +861,7 @@ Int_t KScheduler::startWorkerThread(unsigned threadId){
 Int_t KScheduler::startWorkerThreads(){
     Int_t ret;
     //TThread* thisThread;
-    for(unsigned i = 0; i < NTHREADS; i++){
+    for(int i = 0; i < n_threads; i++){
         ret = startWorkerThread(i);
         // delay in print here is enough for the wArg to work out from run...
         // TODO NEED REAL SYNC FOR THAT (sig after set warg?)

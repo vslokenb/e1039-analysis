@@ -65,10 +65,13 @@ int RecoE906Data(const int run_id, const int spill_id, const string fname_in, co
   auto reco = new MultiThreadReco();
   //reco->Verbosity(100);
   reco->SetOutputFileName(fname_out);
-  //KScheduler::Verbose(10); // default = 0
+  //KScheduler::SetNumThreads(16); // default = 16
+  //KScheduler::SetInputPipeDepth(32); // default = 32
+  //KScheduler::SetOutputPipeDepth(32); // default = 32
+  KScheduler::Verbose(2); // default = 0
   KScheduler::PrintFreq(1000); // default = 100
   //KScheduler::SaveNum(5000); // default = 5000
-  reco->set_enable_KF(false); // default = true
+  reco->set_enable_KF(true); // default = true
   //reco->setInputTy(SQReco::E1039); // default = E1039
   //reco->setFitterTy(SQReco::KFREF); // default = KFREF
   se->registerSubsystem(reco);

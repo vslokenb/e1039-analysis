@@ -27,13 +27,6 @@
 #include <ktracker/UtilSRawEvent.h>
 #include <ktracker/GFFitter.h>
 
-#define NTHREADS 16 // later make JobOpt
-#define INPUT_PIPE_DEPTH 32 // play with iobuffer to load memory vs do computation...
-#define OUTPUT_PIPE_DEPTH 32
-
-#define NEVENT_REDUCERS NTHREADS // reducer factories
-#define NKFAST_TRACKERS NTHREADS // tracking factories
-
 class PHField;
 class TGeoManager;
 class KalmanFitter;
@@ -64,6 +57,15 @@ public:
 
     static void Verbose(const int a) { verb = a; }
     static int  Verbose() { return verb; }
+
+    static void SetNumThreads(const int n) { n_threads = n; }
+    static int  GetNumThreads()     { return n_threads; }
+
+    static void SetInputPipeDepth(const int depth) { input_pipe_depth = depth; }
+    static int  GetInputPipeDepth()         { return input_pipe_depth; }
+
+    static void SetOutputPipeDepth(const int depth) { output_pipe_depth = depth; }
+    static int  GetOutputPipeDepth()         { return output_pipe_depth; }
 
     static void PrintFreq(const int i) { print_freq = i; }
     static int  PrintFreq()     { return print_freq; }
@@ -117,6 +119,9 @@ private:
 
 // stuff
     static int verb;
+    static int n_threads;
+    static int  input_pipe_depth;
+    static int output_pipe_depth;
     static int print_freq;
     static int save_num;
     static bool save_raw_evt;
@@ -187,7 +192,7 @@ private:
 
     // worker threads
     // TODO split into levels: eventReducer...
-    std::array<TThread*, NTHREADS> workThreadArr;
+    std::vector<TThread*> workThreadArr;
 
     // event reducers.,.
     std::queue<EventReducer*> eventReducerQueue;
