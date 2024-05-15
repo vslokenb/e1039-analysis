@@ -51,7 +51,7 @@ KScheduler::KScheduler(TString inFile, TString outFile)
     this->setOutputFilename(outFile);
 }
 
-void KScheduler::Init(PHField* phfield, TGeoManager* t_geo_manager, KalmanFitter* kfitter, SQGenFit::GFFitter* gfitter)
+void KScheduler::Init(PHField* phfield, TGeoManager* t_geo_manager, KalmanFitter* kfitter, SQGenFit::GFFitter* gfitter, SQGenFit::GFField* gfield)
 {
     std::cout << "Initialization of KScheduler ..." << std::endl;
     std::cout << "================================" << std::endl;
@@ -79,6 +79,18 @@ void KScheduler::Init(PHField* phfield, TGeoManager* t_geo_manager, KalmanFitter
         else                     kFastTracker = new KalmanFastTrackletting(phfield, t_geo_manager, false);
         assert(kFastTracker);
         kFastTrkQueue.push(kFastTracker);
+
+        //auto kfit = new KalmanFitter(phfield, t_geo_manager);
+        //kfit->setControlParameter(50, 0.001);
+        //KFitterQueue.push(kfit);
+
+        auto gfit = new SQGenFit::GFFitter();
+        gfit->init(gfield, "KalmanFitterRefTrack");
+        //if      (_fitter_type == SQReco::KF    ) _gfitter->init(_gfield, "KalmanFitter");
+        //else if (_fitter_type == SQReco::KFREF ) _gfitter->init(_gfield, "KalmanFitterRefTrack");
+        //else if (_fitter_type == SQReco::DAF   ) _gfitter->init(_gfield, "DafSimple");
+        //else if (_fitter_type == SQReco::DAFREF) _gfitter->init(_gfield, "DafRef");
+        GFitterQueue.push(gfit);
     }
 
     m_kfitter = kfitter;
@@ -686,9 +698,15 @@ void* KScheduler::fWorkerThread(void* wArgPtr)
         kschd->kftqFSem->Wait();
         kschd->kFTrkQueuePutMutex->Lock();
         KalmanFastTracking* kFastTracker = kschd->kFastTrkQueue.front();
+        //KalmanFitter* kfitter = kschd->KFitterQueue.front();
+        SQGenFit::GFFitter* gfitter = kschd->GFitterQueue.front();
         //kFastTracker->Verbosity(99);
         assert(kFastTracker);
+        //assert(kfitter);
+        assert(gfitter);
         kschd->kFastTrkQueue.pop();
+        //kschd->KFitterQueue.pop();
+        kschd->GFitterQueue.pop();
         kschd->kFTrkQueuePutMutex->UnLock();
         kschd->kftqESem->Post();
 
@@ -713,12 +731,15 @@ void* KScheduler::fWorkerThread(void* wArgPtr)
         for(std::list<Tracklet>::iterator iter = rec_tracklets.begin(); iter != rec_tracklets.end(); ++iter){
             iter->calcChisq();
 
-            KalmanFitter*       kfitter = kschd->GetKFitter();
-            SQGenFit::GFFitter* gfitter = kschd->GetGFitter();
+            KalmanFitter*       kfitter = 0;
+            //KalmanFitter*       kfitter = kschd->GetKFitter();
+            //SQGenFit::GFFitter* gfitter = kschd->GetGFitter();
             SRecTrack recTrack;
             bool fitOK = false;
-            if      (kfitter) fitOK = kschd->fitTrackCand(*iter, kfitter, recTrack);
-            else if (gfitter) fitOK = kschd->fitTrackCand(*iter, gfitter, recTrack);
+            //if      (kfitter) fitOK = kschd->fitTrackCand(*iter, kfitter, recTrack);
+            //else if (gfitter) fitOK = kschd->fitTrackCand(*iter, gfitter, recTrack);
+            //fitOK = kschd->fitTrackCand(*iter, kfitter, recTrack);
+            fitOK = kschd->fitTrackCand(*iter, gfitter, recTrack);
 
             if (!fitOK) {
               recTrack = iter->getSRecTrack(kfitter != 0);
@@ -763,6 +784,8 @@ void* KScheduler::fWorkerThread(void* wArgPtr)
         kschd->kftqESem->Wait();
         kschd->kFTrkQueuePutMutex->Lock();
         kschd->kFastTrkQueue.push(kFastTracker);
+        //kschd->KFitterQueue.push(kfitter);
+        kschd->GFitterQueue.push(gfitter);
         kschd->kFTrkQueuePutMutex->UnLock();
         kschd->kftqFSem->Post();
       

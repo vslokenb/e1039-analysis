@@ -41,7 +41,7 @@ public:
     KScheduler(TString inFile, TString outFile);
     ~KScheduler();
 
-    void Init(PHField* phfield, TGeoManager*t_geo_manager, KalmanFitter* kfitter, SQGenFit::GFFitter* gfitter);
+    void Init(PHField* phfield, TGeoManager*t_geo_manager, KalmanFitter* kfitter, SQGenFit::GFFitter* gfitter, SQGenFit::GFField* gfield);
 
     static TString getInputFilename(); 
     static void    setInputFilename(TString name); 
@@ -198,6 +198,8 @@ private:
     std::queue<EventReducer*> eventReducerQueue;
     // fast trackers...
     std::queue<KalmanFastTracking*> kFastTrkQueue;
+    //std::queue<KalmanFitter*> KFitterQueue;
+    std::queue<SQGenFit::GFFitter*> GFitterQueue;
 
     KalmanFitter* m_kfitter;
     SQGenFit::GFFitter* m_gfitter;

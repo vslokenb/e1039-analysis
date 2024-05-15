@@ -71,8 +71,8 @@ int RecoE906Data(const int run_id, const int spill_id, const string fname_in, co
   KScheduler::Verbose(2); // default = 0
   KScheduler::PrintFreq(1000); // default = 100
   //KScheduler::SaveNum(5000); // default = 5000
-  reco->set_enable_KF(true); // default = true
   //reco->setInputTy(SQReco::E1039); // default = E1039
+  reco->set_enable_KF(true); // default = true
   //reco->setFitterTy(SQReco::KFREF); // default = KFREF
   se->registerSubsystem(reco);
 
