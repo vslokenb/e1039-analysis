@@ -68,7 +68,7 @@ int RecoE906Data(const int run_id, const int spill_id, const string fname_in, co
   //KScheduler::SetNumThreads(16); // default = 16
   //KScheduler::SetInputPipeDepth(32); // default = 32
   //KScheduler::SetOutputPipeDepth(32); // default = 32
-  KScheduler::Verbose(2); // default = 0
+  KScheduler::Verbose(1); // default = 0
   KScheduler::PrintFreq(1000); // default = 100
   //KScheduler::SaveNum(5000); // default = 5000
   //reco->setInputTy(SQReco::E1039); // default = E1039

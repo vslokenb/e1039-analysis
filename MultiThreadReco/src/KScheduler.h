@@ -114,6 +114,7 @@ private:
     Int_t startWorkerThread(unsigned threadId);
     Int_t startWorkerThreads();
 
+    void DoTrackFitting(TClonesArray* tracklets, SRecEvent* srec);
     bool fitTrackCand(Tracklet& tracklet, KalmanFitter* fitter      , SRecTrack& strack);
     bool fitTrackCand(Tracklet& tracklet, SQGenFit::GFFitter* fitter, SRecTrack& strack);
 
@@ -198,8 +199,6 @@ private:
     std::queue<EventReducer*> eventReducerQueue;
     // fast trackers...
     std::queue<KalmanFastTracking*> kFastTrkQueue;
-    //std::queue<KalmanFitter*> KFitterQueue;
-    std::queue<SQGenFit::GFFitter*> GFitterQueue;
 
     KalmanFitter* m_kfitter;
     SQGenFit::GFFitter* m_gfitter;

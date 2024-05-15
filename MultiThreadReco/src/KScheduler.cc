@@ -79,18 +79,6 @@ void KScheduler::Init(PHField* phfield, TGeoManager* t_geo_manager, KalmanFitter
         else                     kFastTracker = new KalmanFastTrackletting(phfield, t_geo_manager, false);
         assert(kFastTracker);
         kFastTrkQueue.push(kFastTracker);
-
-        //auto kfit = new KalmanFitter(phfield, t_geo_manager);
-        //kfit->setControlParameter(50, 0.001);
-        //KFitterQueue.push(kfit);
-
-        auto gfit = new SQGenFit::GFFitter();
-        gfit->init(gfield, "KalmanFitterRefTrack");
-        //if      (_fitter_type == SQReco::KF    ) _gfitter->init(_gfield, "KalmanFitter");
-        //else if (_fitter_type == SQReco::KFREF ) _gfitter->init(_gfield, "KalmanFitterRefTrack");
-        //else if (_fitter_type == SQReco::DAF   ) _gfitter->init(_gfield, "DafSimple");
-        //else if (_fitter_type == SQReco::DAFREF) _gfitter->init(_gfield, "DafRef");
-        GFitterQueue.push(gfit);
     }
 
     m_kfitter = kfitter;
@@ -160,7 +148,6 @@ void KScheduler::Init(PHField* phfield, TGeoManager* t_geo_manager, KalmanFitter
     fRPPtr = 0;
 
     return;
-
 };
 
 KScheduler::~KScheduler(){
@@ -342,18 +329,18 @@ void KScheduler::setOutputFilename(TString name){
 }
 
 void KScheduler::postCompletedEvent(){
-    if(completedEvents % print_freq == 0){
-        avgTimer->Stop();
-        TThread::Printf("completed: %i events, last %i in time shown below:",
-            completedEvents, print_freq);
-        // uhoh gap here?
-        avgTimer->Print("u");
-        avgTimer->Start();
-        TThread::Printf("\n");
-
-    }
-    completedEvents++;
-};
+  if(Verbose() > 0 && completedEvents % print_freq == 0){
+    avgTimer->Stop();
+    TThread::Printf("completed: %i events, last %i in time shown below:",
+                    completedEvents, print_freq);
+    // uhoh gap here?
+    avgTimer->Print("u");
+    avgTimer->Start();
+    //TThread::Printf("\n");
+    
+  }
+  completedEvents++;
+}
 
 // allocates memory for KJOBs - need to delete them in reaperThread
 /**
@@ -527,7 +514,7 @@ void* KScheduler::fReaperThread(void* reaperArg){
         // check for poison
         if(tCompleteJobPtr->isPoison){
           // cleanup job and die... 
-          if(Verbose() > 0) TThread::Printf("ReaperThread got a poison pill...");
+          if(Verbose() > 1) TThread::Printf("ReaperThread got a poison pill...");
           delete tCompleteJobPtr;
           poisonPills++;
           if (poisonPills == n_threads) {
@@ -545,7 +532,7 @@ void* KScheduler::fReaperThread(void* reaperArg){
            continue;
         }
         
-        if(Verbose() > 0){
+        if(Verbose() > 1){
             tCompleteJobPtr->jobMutex->Lock();
             TThread::Printf("fReaper gets jobId: %i, eventID: %i", 
                 tCompleteJobPtr->jobId, tCompleteJobPtr->evData->getEventID());
@@ -560,7 +547,10 @@ void* KScheduler::fReaperThread(void* reaperArg){
         //
         // TODO UNLESS there's a 3rd party daemon that checsk events or jobs...
         // maybe when doing time scheduling? ... careful here...
-        
+
+        /// Perform the track fitting here, because KalmanFitter/GFFitter are not thread-safe.
+        kschd->DoTrackFitting(tCompleteJobPtr->tracklets, tCompleteJobPtr->recEvData);
+
         outputRawEventPtr = tCompleteJobPtr->evData;
         outputRecEventPtr = tCompleteJobPtr->recEvData;
         //outputTracklets = tCompleteJobPtr->tracklets;
@@ -574,18 +564,17 @@ void* KScheduler::fReaperThread(void* reaperArg){
         assert(outputRawEventPtr);
         assert(outputRecEventPtr);
         assert(outputTracklets);
-        if(Verbose() > 0){
-            TThread::Printf("got tracklets: %i for disk for event: %i\n",outputTracklets->GetEntries(), 
-                tCompleteJobPtr->evData->getEventID());
+        if(Verbose() > 1){
+            TThread::Printf("got tracklets: %i for disk for event: %i\n",outputTracklets->GetEntries(), tCompleteJobPtr->evData->getEventID());
             TThread::Printf("outputTracklets pointer is: %p\n", outputTracklets);
         
             if(outputTracklets->GetEntries()>0){
                 Tracklet* printer = (Tracklet*) ref_output[0];
                 TThread::Printf("first tracklet for disk is%p\n",printer);
-                if(printer)
-                    printer->print();
+                if(printer) printer->print();
             }
-       }
+        }
+
         saveTree->Fill();
         if(saveTree->GetEntries() % save_num == 0){
             TThread::Printf("fReaper saving another %i jobs", save_num);
@@ -642,7 +631,7 @@ void* KScheduler::fWorkerThread(void* wArgPtr)
 
         // TODO check for poison pill
         if(tCompleteJobPtr->isPoison){
-          if(Verbose() > 1) TThread::Printf("WorkerThread got a poison pill...");
+          if(Verbose() > 2) TThread::Printf("WorkerThread got a poison pill...");
           running = false;
           //put job in complete queue to kill next part of pipeline
           kschd->cjqESem->Wait();
@@ -659,7 +648,7 @@ void* KScheduler::fWorkerThread(void* wArgPtr)
         // try to acquire a job from the queue...
         /// TODO stuff on the job..
         // semaphore enforces synchronization... (I hope...)
-        if(Verbose() > 0){
+        if(Verbose() > 1){
             TThread::Printf("Worker %u gets jobId: %i, eventID: %i\n", 
                 threadId, tCompleteJobPtr->jobId, tCompleteJobPtr->evData->getEventID());
         }
@@ -673,13 +662,13 @@ void* KScheduler::fWorkerThread(void* wArgPtr)
         kschd->evRedQueuePutMutex->UnLock();
         kschd->erqESem->Post();
 
-        if(Verbose() > 0){
+        if(Verbose() > 1){
             TThread::Printf("Worker %u gets evReducer: %p\n",threadId,evReducer);
         }
 
         // reduce the event...
         int n_red = evReducer->reduceEvent(tCompleteJobPtr->evData);
-        if(Verbose() > 1){
+        if(Verbose() > 2){
           int n_hits = tCompleteJobPtr->evData->getNChamberHitsAll();
           TThread::Printf("Worker %u reduced %u hits (%u -> %u).\n", threadId, n_red, n_hits+n_red, n_hits);
         }
@@ -698,28 +687,22 @@ void* KScheduler::fWorkerThread(void* wArgPtr)
         kschd->kftqFSem->Wait();
         kschd->kFTrkQueuePutMutex->Lock();
         KalmanFastTracking* kFastTracker = kschd->kFastTrkQueue.front();
-        //KalmanFitter* kfitter = kschd->KFitterQueue.front();
-        SQGenFit::GFFitter* gfitter = kschd->GFitterQueue.front();
         //kFastTracker->Verbosity(99);
         assert(kFastTracker);
-        //assert(kfitter);
-        assert(gfitter);
         kschd->kFastTrkQueue.pop();
-        //kschd->KFitterQueue.pop();
-        kschd->GFitterQueue.pop();
         kschd->kFTrkQueuePutMutex->UnLock();
         kschd->kftqESem->Post();
 
         // do something with the tracker
-        if(Verbose() > 0) TThread::Printf("Worker %u gets kFastTracker: %p\n", threadId, kFastTracker);
+        if(Verbose() > 1) TThread::Printf("Worker %u gets kFastTracker: %p\n", threadId, kFastTracker);
 
         // set the event
         int recStatus = kFastTracker->setRawEvent(tCompleteJobPtr->evData); 
-        if((recStatus != 0 && Verbose() > 0) || Verbose() > 1) TThread::Printf("kFastTrackRecStatus: %i", recStatus);
+        if((recStatus != 0 && Verbose() > 1) || Verbose() > 2) TThread::Printf("kFastTrackRecStatus: %i", recStatus);
         tCompleteJobPtr->recEvData->setRecStatus(recStatus);
         tCompleteJobPtr->recEvData->setRawEvent(tCompleteJobPtr->evData);
         std::list<Tracklet>& rec_tracklets = kFastTracker->getFinalTracklets(); 
-        if(Verbose() > 0) {
+        if(Verbose() > 1) {
           TThread::Printf("Worker %u completed setRawEvent: %p, trackletsize = %i\n", threadId, kFastTracker, (int)rec_tracklets.size());
           // tCompleteJobPtr->tracklets->GetEntries()
           //TThread::Printf("job pointer for tracklets is%p\n",tCompleteJobPtr->tracklets);
@@ -731,31 +714,27 @@ void* KScheduler::fWorkerThread(void* wArgPtr)
         for(std::list<Tracklet>::iterator iter = rec_tracklets.begin(); iter != rec_tracklets.end(); ++iter){
             iter->calcChisq();
 
-            KalmanFitter*       kfitter = 0;
             //KalmanFitter*       kfitter = kschd->GetKFitter();
             //SQGenFit::GFFitter* gfitter = kschd->GetGFitter();
-            SRecTrack recTrack;
-            bool fitOK = false;
+            //SRecTrack recTrack;
+            //bool fitOK = false;
             //if      (kfitter) fitOK = kschd->fitTrackCand(*iter, kfitter, recTrack);
             //else if (gfitter) fitOK = kschd->fitTrackCand(*iter, gfitter, recTrack);
-            //fitOK = kschd->fitTrackCand(*iter, kfitter, recTrack);
-            fitOK = kschd->fitTrackCand(*iter, gfitter, recTrack);
-
-            if (!fitOK) {
-              recTrack = iter->getSRecTrack(kfitter != 0);
-              recTrack.setKalmanStatus(-1);
-              //fillRecTrack(recTrack);
-            } else {
-              ++nFittedTracks;
-            }
+            //
+            //if (!fitOK) {
+            //  recTrack = iter->getSRecTrack(kfitter != 0);
+            //  recTrack.setKalmanStatus(-1);
+            //  //fillRecTrack(recTrack);
+            //} else {
+            //  ++nFittedTracks;
+            //}
 
             new((*_tracklets)[nTracklets]) Tracklet(*iter);
             ++nTracklets;
-           
             tCompleteJobPtr->nTracklets++;
-            tCompleteJobPtr->recEvData->insertTrack(recTrack);
+            //tCompleteJobPtr->recEvData->insertTrack(recTrack);
         }
-        if(Verbose() > 0) {
+        if(Verbose() > 1) {
           TThread::Printf("Worker %u: Fitter:  nTracklets = %i, nFittedTracks = %i\n", threadId, nTracklets, nFittedTracks);
         }
 
@@ -784,20 +763,15 @@ void* KScheduler::fWorkerThread(void* wArgPtr)
         kschd->kftqESem->Wait();
         kschd->kFTrkQueuePutMutex->Lock();
         kschd->kFastTrkQueue.push(kFastTracker);
-        //kschd->KFitterQueue.push(kfitter);
-        kschd->GFitterQueue.push(gfitter);
         kschd->kFTrkQueuePutMutex->UnLock();
         kschd->kftqFSem->Post();
       
-       
-        
         //put job in complete queue
         kschd->cjqESem->Wait();
         kschd->cmpJobQueuePutMutex->Lock();
         kschd->cmpJobQueue.push(tCompleteJobPtr);
         kschd->cmpJobQueuePutMutex->UnLock();
         kschd->cjqFSem->Post();
-
     }
 
     // figure out right place to do this... malloced in startWorkerThread
@@ -908,6 +882,36 @@ Int_t KScheduler::stopWorkerThread(){
 
 }
 */
+
+void KScheduler::DoTrackFitting(TClonesArray* tracklets, SRecEvent* srec)
+{
+  int n_trk = tracklets->GetEntries();
+  int n_trk_fit = 0;
+  for (int i_trk = 0; i_trk < n_trk; i_trk++) {
+    Tracklet* tracklet = (Tracklet*)tracklets->At(i_trk);
+
+    KalmanFitter*       kfitter = GetKFitter();
+    SQGenFit::GFFitter* gfitter = GetGFitter();
+    SRecTrack recTrack;
+    bool fitOK = false;
+    if      (kfitter) fitOK = fitTrackCand(*tracklet, kfitter, recTrack);
+    else if (gfitter) fitOK = fitTrackCand(*tracklet, gfitter, recTrack);
+    
+    if (!fitOK) {
+      recTrack = tracklet->getSRecTrack(kfitter != 0);
+      recTrack.setKalmanStatus(-1);
+    } else {
+      n_trk_fit++;
+    }
+    srec->insertTrack(recTrack);
+  }
+  if ((Verbose() > 0 && n_trk > 0) || Verbose() > 1) {
+    int run_id = srec->getRunID();
+    int spill_id = srec->getSpillID();
+    int event_id = srec->getEventID();
+    cout << "DoTrackFitting: run " << run_id << " spill " << spill_id << " event " << event_id << " | " << n_trk_fit << " / " << n_trk << endl;
+  }
+}
 
 /**
  * Copied from SQReco...

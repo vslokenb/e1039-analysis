@@ -41,10 +41,8 @@ int MultiThreadReco::InitRun(PHCompositeNode* topNode)
 
   if (_enable_KF) {
     if (_fitter_type == SQReco::LEGACY) {
-      cout << "ERROR:  SQReco::LEGACY is not supported.  Abort." << endl;
-      exit(1);
-      //_kfitter = new KalmanFitter(_phfield, _t_geo_manager);
-      //_kfitter->setControlParameter(50, 0.001);
+      _kfitter = new KalmanFitter(_phfield, _t_geo_manager);
+      _kfitter->setControlParameter(50, 0.001);
     } else {
       _gfitter = new SQGenFit::GFFitter();
       if      (_fitter_type == SQReco::KF    ) _gfitter->init(_gfield, "KalmanFitter");
@@ -65,9 +63,6 @@ int MultiThreadReco::InitRun(PHCompositeNode* topNode)
 
 int MultiThreadReco::process_event(PHCompositeNode* topNode)
 {
-  //if(is_eval_enabled()) ResetEvalVars();
-  //if(is_eval_dst_enabled()) _tracklet_vector->clear();
-
   bool copy = true;
   if (_input_type == SQReco::E1039) {
     _rawEvent = BuildSRawEvent();
