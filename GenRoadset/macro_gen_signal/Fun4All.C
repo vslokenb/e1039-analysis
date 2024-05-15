@@ -19,8 +19,10 @@ int Fun4All(const int n_evt=0, const int KMag_polarity=+1)
   ///
   /// Global parameters
   ///
+  const int run_id = 5433; // To select the plane geometry.
   double FMAGSTR = -1.054;
   double KMAGSTR = -0.951 * KMag_polarity;
+  rc->set_IntFlag   ("RUNNUMBER", run_id);
   rc->set_DoubleFlag("FMAGSTR", FMAGSTR);
   rc->set_DoubleFlag("KMAGSTR", KMAGSTR);
   rc->set_CharFlag("VTX_GEN_MATERIAL_MODE", "Target");
@@ -32,7 +34,7 @@ int Fun4All(const int n_evt=0, const int KMag_polarity=+1)
   SQPrimaryParticleGen* sq_gen = new SQPrimaryParticleGen();
   switch (gen_switch) {
   case 1: // Drell-Yan: 500 events = 1 hour
-    sq_gen->set_massRange(.5, 9.0);
+    sq_gen->set_massRange(0.5, 9.0);
     sq_gen->set_xfRange(0.00, 0.95);
     sq_gen->enableDrellYanGen();
     break;

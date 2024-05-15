@@ -2,6 +2,7 @@
 
 FN_BKG=$1
 N_EVT=$2
+KMAG_POL=$3 # +1 or -1
 
 if [ -z "$CONDOR_DIR_INPUT" -o -z "$CONDOR_DIR_OUTPUT" ] ; then
     echo "!ERROR!  CONDOR_DIR_INPUT/OUTPUT is undefined.  Abort."
@@ -23,7 +24,7 @@ source $FN_SETUP
 export   LD_LIBRARY_PATH=inst/lib:$LD_LIBRARY_PATH
 export ROOT_INCLUDE_PATH=inst/include:$ROOT_INCLUDE_PATH
 
-time root -b -q "Fun4All.C(\"$CONDOR_DIR_INPUT/$FN_BKG\", $N_EVT)"
+time root -b -q "Fun4All.C(\"$CONDOR_DIR_INPUT/$FN_BKG\", $N_EVT, $KMAG_POL)"
 RET=$?
 if [ $RET -ne 0 ] ; then
     echo "Error in Fun4All.C: $RET"

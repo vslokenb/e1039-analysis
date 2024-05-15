@@ -11,6 +11,7 @@
 #include <TLegend.h>
 #include <TH1D.h>
 #include <UtilAna/UtilTrigger.h>
+#include <UtilAna/UtilBeam.h>
 #include "RoadInfo.h"
 #include "RoadMap.h"
 #include "RoadList.h"
@@ -45,35 +46,16 @@ void AnaBG::Init()
     exit(1);
   }
 
-///---Added by Abi
-  int idx = 0;
-  double list_val[256];
-  int val = 0;
-  list_val[idx++] = val;
-  for (int i = 0; i < 16; i++) { val +=    1; list_val[idx++] = val; }
-  for (int i = 0; i < 20; i++) { val +=    2; list_val[idx++] = val; }
-  for (int i = 0; i < 21; i++) { val +=    4; list_val[idx++] = val; }
-  for (int i = 0; i < 20; i++) { val +=    8; list_val[idx++] = val; }
-  for (int i = 0; i < 15; i++) { val +=   16; list_val[idx++] = val; }
-  for (int i = 0; i <  1; i++) { val +=   31; list_val[idx++] = val; }
-  for (int i = 0; i <  4; i++) { val +=   16; list_val[idx++] = val; }
-  for (int i = 0; i < 21; i++) { val +=   32; list_val[idx++] = val; }
-  for (int i = 0; i < 20; i++) { val +=   64; list_val[idx++] = val; }
-  for (int i = 0; i < 20; i++) { val +=  128; list_val[idx++] = val; }
-  for (int i = 0; i < 21; i++) { val +=  256; list_val[idx++] = val; }
-  for (int i = 0; i < 20; i++) { val +=  512; list_val[idx++] = val; }
-  for (int i = 0; i < 20; i++) { val += 1024; list_val[idx++] = val; }
-  for (int i = 0; i < 21; i++) { val += 2048; list_val[idx++] = val; }
-  for (int i = 0; i <  6; i++) { val += 4096; list_val[idx++] = val; }
-///---------
-
+  int n_val;
+  double* list_val;
+  UtilBeam::ListOfRfValues(n_val, list_val);
 
   ostringstream oss;
   oss << m_dir_out << "/output.root";
   m_file_out = new TFile(oss.str().c_str(), "RECREATE");
  // m_h1_inte_max = new TH1D("h1_inte_max"  , "", 200, 0, 20e3);
   m_h1_inte_max = new TH1D("h1_inte_max"  , "", 1200, 0, 130e3);
- // m_h1_inte = new TH1D("h1_inte"  , "Run 06 NIM3 ", idx-1,list_val);
+ // m_h1_inte = new TH1D("h1_inte"  , "Run 06 NIM3 ", n_val-1, list_val);
   m_h1_inte = new TH1D("h1_inte"  , "", 1200, 0, 1300e3);
 
   m_ofs << "Intensity cut = " << m_inte_cut << endl;

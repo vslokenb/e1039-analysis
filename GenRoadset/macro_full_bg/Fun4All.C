@@ -7,7 +7,7 @@ R__LOAD_LIBRARY(libSQPrimaryGen)
 R__LOAD_LIBRARY(libGenRoadset)
 using namespace std;
 
-int Fun4All(const string fname, const int n_evt=0)
+int Fun4All(const string fname, const int n_evt=0, const int KMag_polarity=+1)
 {
   recoConsts *rc = recoConsts::instance();
   Fun4AllServer *se = Fun4AllServer::instance();
@@ -15,8 +15,10 @@ int Fun4All(const string fname, const int n_evt=0)
   ///
   /// Global parameters
   ///
-  const double FMAGSTR = -1.054;
-  const double KMAGSTR = -0.951;
+  const int run_id = 5433; // To select the plane geometry.
+  double FMAGSTR = -1.054;
+  double KMAGSTR = -0.951 * KMag_polarity;
+  rc->set_IntFlag   ("RUNNUMBER", run_id);
   rc->set_DoubleFlag("FMAGSTR", FMAGSTR);
   rc->set_DoubleFlag("KMAGSTR", KMAGSTR);
 

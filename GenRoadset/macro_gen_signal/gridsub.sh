@@ -1,9 +1,9 @@
 #!/bin/bash
 DIR_MACRO=$(dirname $(readlink -f $BASH_SOURCE))
 
-KMAG_POL=+1 # +1 or -1
-JOB_NAME=main_v2 # KMag polarity = Normal
-#JOB_NAME=main_reverse # KMag polarity = Reverse
+KMAG_POL=-1 # +1 or -1
+#JOB_NAME=main_v2_H1Xgap # KMag polarity = Normal
+JOB_NAME=main_reverse_H1Xgap # KMag polarity = Reverse
 DO_OVERWRITE=no
 USE_GRID=no
 JOB_B=1
@@ -62,7 +62,7 @@ for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
     
     if [ $USE_GRID == yes ]; then
 	CMD="/exp/seaquest/app/software/script/jobsub_submit_spinquest.sh"
-	CMD+=" --expected-lifetime='short'" # medium=8h, short=3h, long=23h
+	CMD+=" --expected-lifetime='medium'" # medium=8h, short=3h, long=23h
 	CMD+=" -L $DIR_WORK_JOB/log_gridrun.txt"
 	CMD+=" -f $DIR_WORK/input.tar.gz"
 	CMD+=" -d OUTPUT $DIR_WORK_JOB/out"

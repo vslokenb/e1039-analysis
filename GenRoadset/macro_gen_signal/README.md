@@ -24,16 +24,18 @@ which runs one job that generates 10 in-acceptance events;
 ## Mass Production
 
 You then execute the following commands to submit grid jobs (`-g`),
-which runs 100 jobs (`-j 100`) that generate 500 events/job (`-e 500`);
+which runs 100 jobs (`-j 100`) that generate 1000 events/job (`-e 1000`);
 
 ```
 source /e906/app/software/script/setup-jobsub-spinquest.sh
 kinit
-./gridsub.sh -g -j 100 -e 500
+./gridsub.sh -g -j 100 -e 1000
 ```
 
 You might submit more jobs when the statistics are not enough;
 
 ```
-./gridsub.sh -g -j 101-200 -e 500
+./gridsub.sh -g -j 101-200 -e 1000
 ```
+
+We usually submit 800 jobs to have the sufficient statistics, as of May 2024.
