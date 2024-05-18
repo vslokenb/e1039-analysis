@@ -70,6 +70,7 @@ void KScheduler::Init(PHField* phfield, TGeoManager* t_geo_manager, KalmanFitter
         assert(eventReducer);
       }
       eventReducerQueue.push(eventReducer);
+      vec_eventReducer.push_back(eventReducer);
     }
 
     //Initialize the kfasttrackers
@@ -79,6 +80,7 @@ void KScheduler::Init(PHField* phfield, TGeoManager* t_geo_manager, KalmanFitter
         else                     kFastTracker = new KalmanFastTrackletting(phfield, t_geo_manager, false);
         assert(kFastTracker);
         kFastTrkQueue.push(kFastTracker);
+        vec_kFastTrk.push_back(kFastTracker);
     }
 
     m_kfitter = kfitter;
@@ -653,18 +655,20 @@ void* KScheduler::fWorkerThread(void* wArgPtr)
                 threadId, tCompleteJobPtr->jobId, tCompleteJobPtr->evData->getEventID());
         }
 
-        // acquire an eventReducer...
-        kschd->erqFSem->Wait();
-        kschd->evRedQueuePutMutex->Lock();
-        EventReducer* evReducer = kschd->eventReducerQueue.front();
-        assert(evReducer);
-        kschd->eventReducerQueue.pop();
-        kschd->evRedQueuePutMutex->UnLock();
-        kschd->erqESem->Post();
+        EventReducer* evReducer = kschd->vec_eventReducer.at(threadId);
 
-        if(Verbose() > 1){
-            TThread::Printf("Worker %u gets evReducer: %p\n",threadId,evReducer);
-        }
+        //// acquire an eventReducer...
+        //kschd->erqFSem->Wait();
+        //kschd->evRedQueuePutMutex->Lock();
+        //EventReducer* evReducer = kschd->eventReducerQueue.front();
+        //assert(evReducer);
+        //kschd->eventReducerQueue.pop();
+        //kschd->evRedQueuePutMutex->UnLock();
+        //kschd->erqESem->Post();
+        //
+        //if(Verbose() > 1){
+        //    TThread::Printf("Worker %u gets evReducer: %p\n",threadId,evReducer);
+        //}
 
         // reduce the event...
         int n_red = evReducer->reduceEvent(tCompleteJobPtr->evData);
@@ -676,22 +680,24 @@ void* KScheduler::fWorkerThread(void* wArgPtr)
         // TODO update hit hinfo for the SQhitvector? needs a lot of
         // bookkeeping...
 
-        // put eventReducer back in the queue...
-        kschd->erqESem->Wait();
-        kschd->evRedQueuePutMutex->Lock();
-        kschd->eventReducerQueue.push(evReducer);
-        kschd->evRedQueuePutMutex->UnLock();
-        kschd->erqFSem->Post();
+        //// put eventReducer back in the queue...
+        //kschd->erqESem->Wait();
+        //kschd->evRedQueuePutMutex->Lock();
+        //kschd->eventReducerQueue.push(evReducer);
+        //kschd->evRedQueuePutMutex->UnLock();
+        //kschd->erqFSem->Post();
 
-        // now the same for the fast tracker
-        kschd->kftqFSem->Wait();
-        kschd->kFTrkQueuePutMutex->Lock();
-        KalmanFastTracking* kFastTracker = kschd->kFastTrkQueue.front();
-        //kFastTracker->Verbosity(99);
-        assert(kFastTracker);
-        kschd->kFastTrkQueue.pop();
-        kschd->kFTrkQueuePutMutex->UnLock();
-        kschd->kftqESem->Post();
+        KalmanFastTracking* kFastTracker = kschd->vec_kFastTrk.at(threadId);
+
+        //// now the same for the fast tracker
+        //kschd->kftqFSem->Wait();
+        //kschd->kFTrkQueuePutMutex->Lock();
+        //KalmanFastTracking* kFastTracker = kschd->kFastTrkQueue.front();
+        ////kFastTracker->Verbosity(99);
+        //assert(kFastTracker);
+        //kschd->kFastTrkQueue.pop();
+        //kschd->kFTrkQueuePutMutex->UnLock();
+        //kschd->kftqESem->Post();
 
         // do something with the tracker
         if(Verbose() > 1) TThread::Printf("Worker %u gets kFastTracker: %p\n", threadId, kFastTracker);
@@ -759,12 +765,12 @@ void* KScheduler::fWorkerThread(void* wArgPtr)
 //            }
 //       }
 
-        // put tracker back in queue...
-        kschd->kftqESem->Wait();
-        kschd->kFTrkQueuePutMutex->Lock();
-        kschd->kFastTrkQueue.push(kFastTracker);
-        kschd->kFTrkQueuePutMutex->UnLock();
-        kschd->kftqFSem->Post();
+        //// put tracker back in queue...
+        //kschd->kftqESem->Wait();
+        //kschd->kFTrkQueuePutMutex->Lock();
+        //kschd->kFastTrkQueue.push(kFastTracker);
+        //kschd->kFTrkQueuePutMutex->UnLock();
+        //kschd->kftqFSem->Post();
       
         //put job in complete queue
         kschd->cjqESem->Wait();

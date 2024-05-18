@@ -195,6 +195,9 @@ private:
     // TODO split into levels: eventReducer...
     std::vector<TThread*> workThreadArr;
 
+    std::vector<EventReducer*      > vec_eventReducer;
+    std::vector<KalmanFastTracking*> vec_kFastTrk;
+
     // event reducers.,.
     std::queue<EventReducer*> eventReducerQueue;
     // fast trackers...

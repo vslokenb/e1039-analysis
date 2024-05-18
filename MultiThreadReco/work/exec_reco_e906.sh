@@ -23,7 +23,9 @@ FN_LOG=$DIR_LOG/log_run_${RUN6}_spill_${SPILL9}.txt
 
 umask 0002
 mkdir -p $DIR_OUT $DIR_LOG
-
-time root.exe -b -q "$DIR_SCRIPT/RecoE906Data.C($RUN, $SPILL, \"$FN_IN\", \"$FN_OUT\", $N_EVT)" |& tee $FN_LOG
-RET=$?
-exit $RET
+{
+    TIMEFORMAT='TIME: real %R user %U sys %S'
+    time root.exe -b -q "$DIR_SCRIPT/RecoE906Data.C($RUN, $SPILL, \"$FN_IN\", \"$FN_OUT\", $N_EVT)"
+    echo "RET: $?"
+} |& tee $FN_LOG
+#exit $RET
