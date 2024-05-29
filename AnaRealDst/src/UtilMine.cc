@@ -6,6 +6,16 @@
 #include "UtilMine.h"
 using namespace std;
 
+std::string UtilMine::GetDstFilePath(const int run_id, const int spill_id, const std::string dir_dst)
+{
+  ostringstream oss;
+  if (dir_dst != "") oss << dir_dst;
+  else               oss << UtilOnline::GetDstFileDir();
+  oss << setfill('0') << "/run_" << setw(6) << run_id;
+  oss << "/run_" << setw(6) << run_id << "_spill_" << setw(9) << spill_id << "_spin.root";
+  return oss.str();
+}
+
 vector<string> UtilMine::GetListOfSpillDSTs(const int run, const string dir_dst)
 {
   ostringstream oss;

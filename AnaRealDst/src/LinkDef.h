@@ -9,5 +9,6 @@
 #pragma link C++ class AnaTriggerHit-!;
 #pragma link C++ class AnaEffHodo-!;
 #pragma link C++ class AnaEffCham-!;
+#pragma link C++ class AnaHardEvent-!;
 
 #endif
