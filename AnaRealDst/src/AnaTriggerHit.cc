@@ -84,6 +84,13 @@ int AnaTriggerHit::InitRun(PHCompositeNode* topNode)
     oss.str("");
     oss << "V1495 Level-" << m_level << " " << name << ";N of hits/plane/event;Hit count";
     m_h1_nhit[i_det]->SetTitle(oss.str().c_str());
+
+    oss.str("");
+    oss << "h1_time_" << name;
+    m_h1_time[i_det] = new TH1D(oss.str().c_str(), "", 2000, -0.5, 1999.5);
+    oss.str("");
+    oss << "V1495 Level-" << m_level << " " << name << ";TDC time (ns);Hit count";
+    m_h1_time[i_det]->SetTitle(oss.str().c_str());
   }
 
   return Fun4AllReturnCodes::EVENT_OK;
@@ -116,7 +123,8 @@ int AnaTriggerHit::process_event(PHCompositeNode* topNode)
       b_time   = (*it)->get_tdc_time  ();
       m_tree->Fill();
 
-      m_h1_ele[i_det]->Fill(b_ele_id);
+      m_h1_ele [i_det]->Fill(b_ele_id);
+      m_h1_time[i_det]->Fill(b_time);
     }
     m_h1_nhit[i_det]->Fill(hv->size());
   }
@@ -138,6 +146,11 @@ int AnaTriggerHit::End(PHCompositeNode* topNode)
     m_h1_nhit[i_det]->Draw();
     oss.str("");
     oss << "result/" << m_h1_nhit[i_det]->GetName() << ".png";
+    c1->SaveAs(oss.str().c_str());
+
+    m_h1_time[i_det]->Draw();
+    oss.str("");
+    oss << "result/" << m_h1_time[i_det]->GetName() << ".png";
     c1->SaveAs(oss.str().c_str());
   }
   delete c1;

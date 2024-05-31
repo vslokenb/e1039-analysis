@@ -30,6 +30,7 @@ class AnaTriggerHit: public SubsysReco {
   double b_time;
   TH1*   m_h1_ele[99];
   TH1*   m_h1_nhit[99];
+  TH1*   m_h1_time[99];
 
  public:
   AnaTriggerHit(const std::string& name="AnaTriggerHit");

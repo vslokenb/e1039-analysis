@@ -11,11 +11,11 @@ int Fun4AllSpillDST(const int run_id=5101, const int nevent=0)
   se->registerInputManager(in);
 
   //se->registerSubsystem(new AnaHodoHit());
-  //se->registerSubsystem(new AnaTriggerHit());
+  se->registerSubsystem(new AnaTriggerHit());
   //se->registerSubsystem(new AnaRealDst());
   //se->registerSubsystem(new AnaEffHodo());
   //se->registerSubsystem(new AnaEffCham(AnaEffCham::D3p));
-  se->registerSubsystem(new AnaHardEvent());
+  //se->registerSubsystem(new AnaHardEvent());
 
   auto list_dst = UtilMine::GetListOfSpillDSTs(run_id);
   for (auto it = list_dst.begin(); it != list_dst.end(); it++) {
