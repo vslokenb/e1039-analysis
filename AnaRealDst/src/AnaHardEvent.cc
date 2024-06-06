@@ -1,7 +1,7 @@
+#include <sstream>
 #include <iomanip>
 #include <TSystem.h>
 #include <TFile.h>
-#include <TTree.h>
 #include <TH1D.h>
 #include <TCanvas.h>
 #include <interface_main/SQRun.h>
@@ -19,7 +19,7 @@ using namespace std;
 AnaHardEvent::AnaHardEvent(const std::string& name)
   : SubsysReco(name)
   , m_file(0)
-  , m_tree(0)
+  , m_h1_n_ttdc(0)
 {
   ;
 }
@@ -46,11 +46,6 @@ int AnaHardEvent::InitRun(PHCompositeNode* topNode)
   m_ofs.open("result/log.txt");
 
   m_file = new TFile("result/output.root", "RECREATE");
-//  m_tree = new TTree("tree", "Created by AnaHardEvent");
-//  m_tree->Branch("det"     , &b_det     ,      "det/I");
-//  m_tree->Branch("ele"     , &b_ele     ,      "ele/I");
-//  m_tree->Branch("time"    , &b_time    ,     "time/D");
-
   m_h1_n_ttdc = new TH1D("h1_n_ttdc", ";N of Taiwan TDCs", 100, -0.5, 99.5);
 
   return Fun4AllReturnCodes::EVENT_OK;
@@ -58,9 +53,8 @@ int AnaHardEvent::InitRun(PHCompositeNode* topNode)
 
 int AnaHardEvent::process_event(PHCompositeNode* topNode)
 {
-  //int sp_id  = m_evt->get_spill_id();
+  int sp_id  = m_evt->get_spill_id();
   int evt_id = m_evt->get_event_id();
-
   //if (! m_evt->get_trigger(SQEvent::NIM2)) {
   //  return Fun4AllReturnCodes::EVENT_OK;
   //}
@@ -68,11 +62,10 @@ int AnaHardEvent::process_event(PHCompositeNode* topNode)
   int coda_evt_id = m_hard_evt->get_coda_event_id();
   short n_ttdc    = m_hard_evt->get_n_board_taiwan();
   //short n_v1495   = m_hard_evt->get_n_board_v1495();
+  if (evt_id == 27294) cout << "E " << evt_id << " C " << coda_evt_id << " S " << sp_id << " N " << n_ttdc << endl;
 
   m_h1_n_ttdc->Fill(n_ttdc);
-  if (n_ttdc != 82) {
-    m_ofs << evt_id << "\t" << coda_evt_id << "\t" << n_ttdc << "\n";
-  }
+  if (n_ttdc != 82) m_ofs << evt_id << "\t" << coda_evt_id << "\t" << n_ttdc << "\n";
 
   return Fun4AllReturnCodes::EVENT_OK;
 }

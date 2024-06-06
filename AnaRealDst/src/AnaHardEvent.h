@@ -3,7 +3,6 @@
 #include <fstream>
 #include <fun4all/SubsysReco.h>
 class TFile;
-class TTree;
 class TH1;
 class TH2;
 class SQEvent;
@@ -16,10 +15,6 @@ class AnaHardEvent: public SubsysReco {
 
   std::ofstream m_ofs;
   TFile* m_file;
-  TTree* m_tree;
-  int    b_det;
-  int    b_ele;
-  double b_time;
   TH1*   m_h1_n_ttdc;
 
  public:

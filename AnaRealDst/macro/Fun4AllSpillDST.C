@@ -1,7 +1,7 @@
 R__LOAD_LIBRARY(AnaRealDst)
 
 /// Fun4All macro to analyze spill-by-spill DST files of the given run.
-int Fun4AllSpillDST(const int run_id=5101, const int nevent=0)
+int Fun4AllSpillDST(const int run_id=5598, const int nevent=0)
 {
   Fun4AllServer* se = Fun4AllServer::instance();
   se->setRun(run_id);
@@ -11,7 +11,8 @@ int Fun4AllSpillDST(const int run_id=5101, const int nevent=0)
   se->registerInputManager(in);
 
   //se->registerSubsystem(new AnaHodoHit());
-  se->registerSubsystem(new AnaTriggerHit());
+  //se->registerSubsystem(new AnaTriggerHit());
+  se->registerSubsystem(new AnaTrigSignal());
   //se->registerSubsystem(new AnaRealDst());
   //se->registerSubsystem(new AnaEffHodo());
   //se->registerSubsystem(new AnaEffCham(AnaEffCham::D3p));
@@ -27,5 +28,5 @@ int Fun4AllSpillDST(const int run_id=5101, const int nevent=0)
 
   se->End();
   delete se;
-  return 0;
+  exit(0); //return 0;
 }
