@@ -23,8 +23,11 @@ class GenRoadset : public AnaBase {
 
   void SetMap(AnaSignal* ana_signal);
 
+  void SymmetrizeRoads();
+
   void GenerateRoadSetBySignal(const double frac_cut, const std::string rs_id);
   void GenerateRoadSetByFoM(const double frac_cut, const std::string rs_id);
+  void GenerateSymmetricRoadSetByFoM(const double frac_cut, const std::string rs_id);
 
   //RoadMap * GetRoadMapPosTop () { return &m_map_pos_top ; }
   //RoadMap * GetRoadMapPosBot () { return &m_map_pos_bot ; }
@@ -39,6 +42,9 @@ class GenRoadset : public AnaBase {
  protected:
   void DisableRoadsByWeightFraction(RoadList* road_list, const double frac);
   void DisableRoadsByFoM(RoadList* road_list, const double frac);
+
+  int FlipRoadLeftRight(const int road);
+  int FlipRoadTopBottom(const int road);
 };
 
 #endif /* _GEN_ROADSET__H_ */

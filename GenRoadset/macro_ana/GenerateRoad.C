@@ -5,6 +5,7 @@ using namespace std;
 /// Macro to generate a roadset based on the S/N FoM.
 void GenerateRoad()
 {
+  const bool make_symm = true;
   string rs_id;
   double mass_lo;
   double mass_hi;
@@ -38,7 +39,12 @@ void GenerateRoad()
   cout << "\nGenerate a roadset." << endl;
   GenRoadset* gen_rs = new GenRoadset("gen_rs" + rs_id);
   gen_rs->SetMap(ana_sig);
-  gen_rs->GenerateRoadSetByFoM(frac_cut, rs_id);
+  if (make_symm) {
+    gen_rs->SymmetrizeRoads();
+    gen_rs->GenerateSymmetricRoadSetByFoM(frac_cut, rs_id);
+  } else {
+    gen_rs->GenerateRoadSetByFoM(frac_cut, rs_id);
+  }
 
   delete gen_rs;
   delete ana_bg;

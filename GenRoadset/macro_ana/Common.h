@@ -6,9 +6,11 @@
 // 129: 2.0-9.0 GeV, BG = full bkg, reverse KMag pol
 // 120: 2.0-9.0 GeV, BG = full bkg, normal  KMag pol, H1X y-gap
 // 130: 2.0-9.0 GeV, BG = full bkg, reverse KMag pol, H1X y-gap
+// 131: 2.0-9.0 GeV, BG = full bkg, normal  KMag pol, H1X y-gap, symmetric
+// 132: 2.0-9.0 GeV, BG = full bkg, reverse KMag pol, H1X y-gap, symmetric
 void GetParams(string& rs_id, double& mass_lo, double& mass_hi, int& inte_cut, double& frac_cut, string& list_sig, string& list_bg)
 {
-  rs_id    = "130"; // Select a roadset here to analyze.
+  rs_id    = "134"; // Select a roadset here to analyze.
   list_sig = "list_signal.txt";
   list_bg  = "list_bg.txt";
   
@@ -70,6 +72,32 @@ void GetParams(string& rs_id, double& mass_lo, double& mass_hi, int& inte_cut, d
     mass_hi  = 9.0;
     inte_cut = 42000;
     frac_cut = 0.10;
+    list_sig = "list_signal_reverseKMAG.txt";
+    list_bg  = "list_bg_fullsimRun06_reverseKMAG.txt";
+  } else if (rs_id == "131") {
+    mass_lo  = 2.0;
+    mass_hi  = 9.0;
+    inte_cut = 42000;
+    frac_cut = 0.086; // 0.100 too larger, 0.080, too small?
+    list_bg  =  "list_bg_fullsimRun06.txt";
+  } else if (rs_id == "132") {
+    mass_lo  = 2.0;
+    mass_hi  = 9.0;
+    inte_cut = 42000;
+    frac_cut = 0.36;
+    list_sig = "list_signal_reverseKMAG.txt";
+    list_bg  = "list_bg_fullsimRun06_reverseKMAG.txt";
+  } else if (rs_id == "133") {
+    mass_lo  = 2.0;
+    mass_hi  = 9.0;
+    inte_cut = 1000; // Does not matter
+    frac_cut = 0;
+    list_bg  =  "list_bg_fullsimRun06.txt";
+  } else if (rs_id == "134") {
+    mass_lo  = 2.0;
+    mass_hi  = 9.0;
+    inte_cut = 1000; // Does not matter
+    frac_cut = 0;
     list_sig = "list_signal_reverseKMAG.txt";
     list_bg  = "list_bg_fullsimRun06_reverseKMAG.txt";
   }
