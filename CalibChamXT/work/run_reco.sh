@@ -46,7 +46,7 @@ function ProcessOneRun {
 	cp -a    $DIR_BASE/gridrun.sh $DIR_WORK/$BASE_NAME
 
 	if [ $USE_GRID = 'yes' ]; then
-	    CMD="/e906/app/software/script/jobsub_submit_spinquest.sh"
+	    CMD="/exp/seaquest/app/software/script/jobsub_submit_spinquest.sh"
 	    CMD+=" --expected-lifetime='medium'" # medium=8h, short=3h, long=23h
 	    CMD+=" -L $DIR_WORK/$BASE_NAME/log_gridrun.txt"
 	    CMD+=" -f $DIR_WORK/input.tar.gz"
