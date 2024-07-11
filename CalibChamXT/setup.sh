@@ -2,8 +2,8 @@ DIR_TOP=$(dirname $(readlink -f $BASH_SOURCE))
 DIR_BUILD=$DIR_TOP/build
 DIR_INST=$DIR_TOP/inst
 
-#FN_SETUP=/exp/seaquest/app/software/osg/software/e1039/this-e1039.sh
-FN_SETUP=/exp/seaquest/app/software/osg/users/kenichi/e1039/core-20220404/this-e1039.sh
+FN_SETUP=/exp/seaquest/app/software/osg/software/e1039/this-e1039.sh
+#FN_SETUP=/exp/seaquest/app/software/osg/users/kenichi/e1039/core-20220404/this-e1039.sh
 if [ ! -e $FN_SETUP ] ; then # On grid
     FN_SETUP=/cvmfs/seaquest.opensciencegrid.org/seaquest/${FN_SETUP#/exp/seaquest/app/software/osg/}
 fi
