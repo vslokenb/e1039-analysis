@@ -58,12 +58,13 @@ void FitRTDist::CalcChi2(const double* pars, double& chi2, int& ndf)
   chi2 = 0;
   ndf  = 0;
   double r_width = m_h2_RT->GetYaxis()->GetBinWidth(1);
+  int n_r = m_h2_RT->GetNbinsY();
   for (int it = m_h2_RT->GetNbinsX(); it > 0; it--) {
-    double cont_t  = m_h2_RT->Integral(it, it);
+    double cont_t  = m_h2_RT->Integral(it, it, 1, n_r);
     if (cont_t < 10) continue;
     double t_cent = m_h2_RT->GetXaxis()->GetBinCenter(it);
     double r_func = rtc.EvalR(t_cent);
-    for (int ir = m_h2_RT->GetNbinsY(); ir > 0; ir--) {
+    for (int ir = n_r; ir > 0; ir--) {
       double cont = m_h2_RT->GetBinContent(it, ir);
       if (cont <= 0) continue;
       double r_cent  = m_h2_RT->GetYaxis()->GetBinCenter(ir);
