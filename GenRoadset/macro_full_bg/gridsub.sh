@@ -5,10 +5,19 @@ DIR_MACRO=$(dirname $(readlink -f $BASH_SOURCE))
 #DIR_BKG="/pnfs/e1039/persistent/users/apun/bkg_study/e1039pythiaGen_Jan22/003"
 DIR_BKG="/pnfs/e1039/persistent/users/apun/bkg_study/fullbg_candidates/01"
 
-KMAG_POL=+1 # +1 or -1
-JOB_NAME=main_01_nim3potv2_H1Xgap # Normal KMag polarity
+#KMAG_POL=+1
+#JOB_NAME=main_01_nim3potv2_H1Xgap # Normal KMag polarity
+
+#KMAG_POL=-1
 #JOB_NAME=main_01_nim3pot_reverseMag_H1Xgap
 # Reverse KMag polarity #main_01_run6nim3_pcoeff025_thes70k #main_jan22_003
+
+#KMAG_POL=0
+#JOB_NAME=main_01_nim3pot_zero_H1Xgap
+
+KMAG_POL=+1
+KMAG_SC=0.5
+JOB_NAME=main_01_nim3pot_normal050
 
 DO_OVERWRITE=no
 USE_GRID=no
@@ -84,7 +93,7 @@ for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
 	CMD+=" -f $DIR_WORK/input.tar.gz"
 	CMD+=" -f $DIR_BKG/$FN_BKG"
 	CMD+=" -d OUTPUT $DIR_WORK_JOB/out"
-	CMD+=" file://$DIR_WORK_JOB/gridrun.sh $FN_BKG $N_EVT $KMAG_POL"
+	CMD+=" file://$DIR_WORK_JOB/gridrun.sh $FN_BKG $N_EVT $KMAG_POL $KMAG_SC"
 	unbuffer $CMD |& tee $DIR_WORK_JOB/log_jobsub_submit.txt
 	RET_SUB=${PIPESTATUS[0]}
 	test $RET_SUB -ne 0 && exit $RET_SUB
@@ -95,6 +104,6 @@ for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
 	cp -p $DIR_WORK/input.tar.gz $DIR_WORK_JOB/in
 	ln -nfs $DIR_BKG/$FN_BKG $DIR_WORK_JOB/in
 	cd $DIR_WORK_JOB
-	$DIR_WORK_JOB/gridrun.sh $FN_BKG $N_EVT $KMAG_POL |& tee $DIR_WORK_JOB/log_gridrun.txt
+	$DIR_WORK_JOB/gridrun.sh $FN_BKG $N_EVT $KMAG_POL $KMAG_SC |& tee $DIR_WORK_JOB/log_gridrun.txt
     fi
 done

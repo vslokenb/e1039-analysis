@@ -1,9 +1,19 @@
 #!/bin/bash
 DIR_MACRO=$(dirname $(readlink -f $BASH_SOURCE))
 
-KMAG_POL=-1 # +1 or -1
+#KMAG_POL=+1
 #JOB_NAME=main_v2_H1Xgap # KMag polarity = Normal
-JOB_NAME=main_reverse_H1Xgap # KMag polarity = Reverse
+
+#KMAG_POL=-1
+#JOB_NAME=main_reverse_H1Xgap # KMag polarity = Reverse
+
+#KMAG_POL=0
+#JOB_NAME=main_zero_H1Xgap
+
+KMAG_POL=+1
+KMAG_SC=0.5
+JOB_NAME=main_normal050
+
 DO_OVERWRITE=no
 USE_GRID=no
 JOB_B=1
@@ -66,7 +76,7 @@ for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
 	CMD+=" -L $DIR_WORK_JOB/log_gridrun.txt"
 	CMD+=" -f $DIR_WORK/input.tar.gz"
 	CMD+=" -d OUTPUT $DIR_WORK_JOB/out"
-	CMD+=" file://$DIR_WORK_JOB/gridrun.sh $N_EVT $KMAG_POL"
+	CMD+=" file://$DIR_WORK_JOB/gridrun.sh $N_EVT $KMAG_POL $KMAG_SC"
 	unbuffer $CMD |& tee $DIR_WORK_JOB/log_jobsub_submit.txt
 	RET_SUB=${PIPESTATUS[0]}
 	test $RET_SUB -ne 0 && exit $RET_SUB
@@ -76,6 +86,6 @@ for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
 	mkdir -p $DIR_WORK_JOB/in
 	cp -p $DIR_WORK/input.tar.gz $DIR_WORK_JOB/in
 	cd $DIR_WORK_JOB
-	$DIR_WORK_JOB/gridrun.sh $N_EVT $KMAG_POL |& tee $DIR_WORK_JOB/log_gridrun.txt
+	$DIR_WORK_JOB/gridrun.sh $N_EVT $KMAG_POL $KMAG_SC |& tee $DIR_WORK_JOB/log_gridrun.txt
     fi
 done
