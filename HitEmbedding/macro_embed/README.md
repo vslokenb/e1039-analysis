@@ -49,7 +49,6 @@ which processes only the first 10 events in the 1st job (i.e. input file pair) o
 
 You then execute the following commands to submit grid jobs;
 ```
-source /e906/app/software/script/setup-jobsub-spinquest.sh
 ./gridsub.sh -g jpsi_20211012
 ```
 

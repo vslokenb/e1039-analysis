@@ -38,7 +38,6 @@ which runs one job that generates 100 events;
 You then execute the following commands to submit grid jobs (`-g`),
 which runs 100 jobs (`-j 100`) that generate 5000 events/job (`-e 5000`);
 ```
-source /e906/app/software/script/setup-jobsub-spinquest.sh
 ./gridsub.sh -g -j 100 -e 5000 jpsi_20211011
 ```
 

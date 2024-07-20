@@ -27,7 +27,6 @@ Typically you first execute the following command to execute the macro on local 
 
 You then execute the following commands to submit grid jobs;
 ```
-source /e906/app/software/script/setup-jobsub-spinquest.sh
 ./gridsub.sh emb_20210823 1 50 1000
 ```
 

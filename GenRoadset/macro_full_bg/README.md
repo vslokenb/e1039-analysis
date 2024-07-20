@@ -30,7 +30,6 @@ You then execute the following commands to submit grid jobs (`-g`),
 which runs 100 jobs (`-j 100`) that generate events as many as possible (`-e 0`);
 
 ```
-source /exp/seaquest/app/software/script/setup-jobsub-spinquest.sh
 kinit
 ./gridsub.sh -g -j 100 -e 0
 ```
