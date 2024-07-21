@@ -43,7 +43,7 @@ while true ; do
 	    R ) (( N_JOB_RUN++ )) ;;
 	    H ) (( N_JOB_HELD++ )) ;;
 	esac
-    done < <(jobsub_q --user=$USER | grep -f $LIST_JOB_ID)
+    done < <(jobsub_q --group spinquest --user=$USER | grep -f $LIST_JOB_ID)
     echo "N_JOB_IDLE = $N_JOB_IDLE"
     echo "N_JOB_RUN  = $N_JOB_RUN"
     echo "N_JOB_HELD = $N_JOB_HELD"

@@ -73,7 +73,7 @@ kinit
 ./run_reco.sh -g GO
 ```
 
-You use `jobsub_q_mine` (or `./check_job.sh`) to wait until all grid jobs finish.
+You use `jobsub_q --group spinquest --user=$USER` (or `./check_job.sh`) to wait until all grid jobs finish.
 
 ```
 ~kenichi/bin/hadddraw -o hist_raw data/main/run_*/out/output_*.root
