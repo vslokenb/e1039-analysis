@@ -92,7 +92,7 @@ cd work
 
 This script executes an Fun4All macro (`Fun4AllAna.C`), which makes use of a SubsysReco modle (`src/SRMakeRTCurve`) to analyze `DSTreco.root`.
 
-Note that `make_rt.sh` has two commented-out lines that find ana analyze the evaluation file (`eval.root`) using a ROOT macro (`AnaRTCurve.C`).
+Note that `make_rt.sh` has two commented-out lines that find and analyze the evaluation file (`eval.root`) using a ROOT macro (`AnaRTCurve.C`).
 This part is kept for backward compatibility for now, but probably be deleted soon.
 
 
