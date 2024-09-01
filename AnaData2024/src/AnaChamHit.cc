@@ -64,6 +64,7 @@ int AnaChamHit::process_event(PHCompositeNode* topNode)
   m_evt.event_id  = m_sq_evt->get_event_id();
   m_evt.fpga_bits = (m_sq_evt->get_trigger() >> SQEvent::MATRIX1) & 0x1f;
   m_evt.nim_bits  = (m_sq_evt->get_trigger() >> SQEvent::NIM1   ) & 0x1f;
+  m_evt.D1 = m_evt.D2 = m_evt.D3p = m_evt.D3m = 0;
   
   GeomSvc* geom = GeomSvc::instance();
   m_hit_list.clear();
@@ -71,6 +72,11 @@ int AnaChamHit::process_event(PHCompositeNode* topNode)
     SQHit* hit = *it;
     int det_id = hit->get_detector_id();
     if (! geom->isChamber(det_id)) continue;
+
+    if      ( 0 < det_id && det_id <=  6) m_evt.D1++;
+    else if (12 < det_id && det_id <= 18) m_evt.D2++;
+    else if (18 < det_id && det_id <= 24) m_evt.D3p++;
+    else if (24 < det_id && det_id <= 30) m_evt.D3m++;
 
     HitData hd;
     hd.det_id     = det_id;

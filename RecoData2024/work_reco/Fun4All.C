@@ -1,0 +1,57 @@
+R__LOAD_LIBRARY(libcalibrator)
+R__LOAD_LIBRARY(libktracker)
+R__LOAD_LIBRARY(RecoData2024)
+
+int Fun4All(const int run_id, const int spill_id, const string DST_in, const string DST_out, const int n_evt=0)
+{
+  recoConsts* rc = recoConsts::instance();
+  rc->set_BoolFlag("COARSE_MODE", false);
+  rc->set_BoolFlag("REQUIRE_MUID", false);
+  rc->set_CharFlag("AlignmentMille", "config/align_mille_v09.txt");
+  rc->set_CharFlag("AlignmentHodo", "");
+  rc->set_CharFlag("AlignmentProp", "");
+  rc->set_CharFlag("Calibration", "");
+  rc->set_IntFlag ("MaxHitsDC0" , 120); // 180); // 350
+  rc->set_IntFlag ("MaxHitsDC1" , 120); // 180); // 350
+  rc->set_IntFlag ("MaxHitsDC2" ,  60); //  90); // 170
+  rc->set_IntFlag ("MaxHitsDC3p",  50); //  70); // 140
+  rc->set_IntFlag ("MaxHitsDC3m",  50); //  70 350m); // 140
+  
+  Fun4AllServer* se = Fun4AllServer::instance();
+  se->setRun(run_id);
+  //se->Verbosity(1);
+
+  se->registerSubsystem(new CalibDriftDist());
+
+  SQReco* reco = new SQReco();
+  //reco->Verbosity(999);
+  reco->set_legacy_rec_container(true);
+  reco->set_geom_file_name("config/geom.root");
+  reco->set_enable_KF(false);
+  reco->setInputTy(SQReco::E1039);
+  reco->setFitterTy(SQReco::KFREF);
+  reco->set_evt_reducer_opt("none");
+  reco->set_enable_eval_dst(true);
+  for (int ii = 0; ii <= 3; ii++) reco->add_eval_list(ii);
+  reco->set_enable_eval(true);
+  reco->set_eval_file_name("eval.root");
+  se->registerSubsystem(reco);
+
+  VertexFit* vtx_fit = new VertexFit();
+  //vtx_fit->set_eval_file_name(vtxevalloc);
+  se->registerSubsystem(vtx_fit);
+  
+  se->registerSubsystem(new AnaDimuon());
+
+  Fun4AllInputManager* in = new Fun4AllDstInputManager("DSTIN");
+  se->registerInputManager(in);
+  in->fileopen(DST_in);
+
+  Fun4AllDstOutputManager* out = new Fun4AllDstOutputManager("DSTOUT", DST_out);
+  se->registerOutputManager(out);
+
+  se->run(n_evt);
+  se->End();
+  delete se;
+  exit(0); //return 0;
+}

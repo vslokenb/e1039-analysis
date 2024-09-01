@@ -27,9 +27,9 @@ display result/h1_ele_30.png &
 
 Here are what happens in each step:
 - `source setup.sh` does
-    - Set up the E1039 software environment.
+    - Set up the E1039 software environment, and 
     - Define shell variables and functions to build and use the source code.
-    You need execute this command when opening a new text terminal.
+    - You need execute this command when opening a new text terminal.
 - `cmake-this` and `make-this` build the source code under `src/`.
     You can execute these commands at any directory.
 - `gridsub.sh` sets up a subdirectory per run to analyze DST files of the runs.
@@ -54,7 +54,7 @@ kinit
 ```
 
 You might execute `jobsub_q --group spinquest --user=$USER` to monitor the job status.
-Once you confirm that the jobs are running fine, you submit more jobs for the other runs;
+Once you confirm that the jobs are running fine, you submit more jobs for the remaining runs;
 ```
 ./gridsub.sh -g -j 11-
 ```

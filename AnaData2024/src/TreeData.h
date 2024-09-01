@@ -10,6 +10,10 @@ struct EventData {
   int   event_id;
   short fpga_bits;
   short nim_bits;
+  short D1;
+  short D2;
+  short D3p;
+  short D3m;
 
   EventData();
   virtual ~EventData() {;}

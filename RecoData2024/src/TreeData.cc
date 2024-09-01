@@ -15,11 +15,17 @@ EventData::EventData()
   ;
 }
 
-HitData::HitData() 
-  : det_id    (0)
-  , ele_id    (0)
-  , tdc_time  (0)
-  , drift_dist(0)
+DimuonData::DimuonData() 
+  : pos(0,0,0)
+  , mom(0,0,0,0)
+  , n_hits_pos(0)
+  , chisq_pos (0)
+  , pos_pos   (0,0,0)
+  , mom_pos   (0,0,0,0)
+  , n_hits_neg(0)
+  , chisq_neg (0)
+  , pos_neg   (0,0,0)
+  , mom_neg   (0,0,0,0)
 {
   ;
 }
