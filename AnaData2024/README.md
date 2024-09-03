@@ -53,7 +53,7 @@ kinit
 ./gridsub.sh -g -j 1-10
 ```
 
-You might execute `jobsub_q --group spinquest --user=$USER` to monitor the job status.
+You might execute `jobsub_q_mine` to monitor the job status, which is an alias of `jobsub_q --group spinquest --user=$USER` defined in `setup.sh`.
 Once you confirm that the jobs are running fine, you submit more jobs for the remaining runs;
 ```
 ./gridsub.sh -g -j 11-
@@ -67,7 +67,7 @@ display result/h1_ele_30.png &
 ```
 
 
-## Your Analysis
+## Modification of Analysis
 
 The contents of analysis are programmed in `src/AnaChamHit.(h|cc)`.
 Thus you need modify these files to do the analysis you need.

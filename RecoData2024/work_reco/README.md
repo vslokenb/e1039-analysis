@@ -6,26 +6,30 @@ These data are used in this directory, as selected by `DIR_DST` in `gridsub.sh`.
 
 ## Test of Reconstruction Using a Few Runs
 
-The procedure below will analyze the 4th good run to draw basic dimuon variables.
+The procedure below will analyze the 1st good spill (not run) to draw basic dimuon variables.
 
 ```
-./gridsub.sh -j 4-4
+cd /path/to/your/e1039-analysis/RecoData2024/work_reco
+source ../setup.sh
+./gridsub.sh -j 1-1
 root -b 'AnaEventTree.C("scratch/reco")'
 display result/h1_m.png &
 ```
 
 Here are what happens in each step:
 - `gridsub.sh` sets up a subdirectory (per run) to analyze DST files of the given run(s).
-    - The option `-j 4-4` selects the 4th run (listed in `list_run_spill.txt`).
-    - Analyzing one run is directed by `gridrun.sh` and `Fun4All.C`.
+    - The option `-j 1-1` selects the 1st spill (listed in `list_run_spill.txt`).
+    - Processing one spill is directed by `gridrun.sh` and `Fun4All.C`.
     - A SubsysReco module, `AnaDimuon`, is registered by default.
-    - The analysis runs on local computer by default (i.e. when `-g` is not given).
-    - Extracted dimuon parameters are stored in `scratch/default/run_*/out/output.root` as TTree.
+      Thus a simple analysis is carried out after the reconstruction.
+    - The process runs on local computer by default (i.e. when `-g` is not given).
+    - Dimuon parameters extracted by `AnaDimuon` are stored in `scratch/reco/run_*/out/output.root` as TTree.
 - `AnaEventTree.C` reads the TTree files to draw histograms.
     - Histograms are saved under `result/`.
+    - Histograms should be empty since only one spill was processed so far.
 
 
-## Reconstruction of All Runs
+## Reconstruction of All Runs/Spills
 
 You can process all runs/spills by adjusting the `-j` option of `gridsub.sh`.
 The `-g` option let you use the Grid computing.
@@ -35,7 +39,7 @@ kinit
 ./gridsub.sh -g -j 1-10
 ```
 
-You might execute `jobsub_q --group spinquest --user=$USER` to monitor the job status.
+You might execute `jobsub_q_mine` to monitor the job status, which is an alias of `jobsub_q --group spinquest --user=$USER` defined in `setup.sh`.
 Once you confirm that the jobs are running fine, you submit more jobs for the remaining runs;
 ```
 ./gridsub.sh -g -j 11-200
@@ -43,7 +47,7 @@ Once you confirm that the jobs are running fine, you submit more jobs for the re
 ./gridsub.sh -g -j 1001-
 ```
 
-The output files are stored under `data/` in case Grid is used.
+The output files are stored under `data/reco/` in case Grid is used.
 You can analyze them once (almost) all jobs finish;
 ```
 root -b AnaEventTree.C

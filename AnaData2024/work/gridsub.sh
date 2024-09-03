@@ -1,7 +1,6 @@
 #!/bin/bash
 DIR_MACRO=$(dirname $(readlink -f $BASH_SOURCE))
 DIR_DST=/pnfs/e1039/persistent/users/kenichi/dst
-#DIR_DST=/data2/e1039/dst
 
 JOB_NAME=default
 DO_OVERWRITE=no
@@ -48,7 +47,6 @@ if [ $USE_GRID == yes ]; then
     ln -nfs $DIR_DATA data # for convenience
 else
     DIR_WORK=$DIR_MACRO/scratch/$JOB_NAME
-    #DIR_WORK=/dev/shm/$USER/AnaData2024/$JOB_NAME
 fi
 
 cd $DIR_MACRO
@@ -64,7 +62,10 @@ for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
     if [ -e $DIR_WORK_JOB ] ; then
 	echo -n "  DIR_WORK_JOB already exists."
 	if [ $DO_OVERWRITE = yes ] ; then
-	    echo "  Clean up."
+	    echo "  Clean up (-o)."
+	    rm -rf $DIR_WORK_JOB
+	elif [ ! -e $DIR_WORK_JOB/out/status.txt ] ; then
+	    echo "  Clean up (no status file)."
 	    rm -rf $DIR_WORK_JOB
 	else
 	    echo "  Skip."

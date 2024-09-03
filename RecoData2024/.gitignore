@@ -3,4 +3,5 @@ inst
 scratch
 *.png
 *.root
+work*/data
 work*/result/

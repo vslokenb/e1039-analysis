@@ -8,8 +8,8 @@ It analyzes the good runs and spills listed in `work/list_run_spill.txt`, which 
 ## Shell Environment and Source Code
 
 This program depends on the E1039 software.
-You need source `setup.sh` when you open a new text terminal to use the program.
-A sub-directory, `src/`, contains a SubsysReco module (and any other code) for analysis.
+You need source `setup.sh` every time you open a new text terminal to use the program.
+A sub-directory, `src/`, contains a SubsysReco module for analysis.
 It should be built via two commands, `cmake-this` and `make-this`, which are defined in `setup.sh`.
 They can be executed at any directory.
 

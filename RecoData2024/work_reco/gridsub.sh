@@ -28,7 +28,6 @@ while read RUN SPILL ; do
     LIST_SPILL+=($SPILL)
 done <$FN_LIST
 N_DAT=${#LIST_RUN[*]}
-#N_DAT=$(cat $FN_LIST | wc -l)
 
 if [ "${JOB_E%-*}" != "$JOB_E" ] ; then # Contain '-'
     JOB_B=${JOB_E%-*} # Before '-'
@@ -70,7 +69,7 @@ for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
     if [ -e $DIR_WORK_JOB ] ; then
 	echo -n "  DIR_WORK_JOB already exists."
 	if [ $DO_OVERWRITE = yes ] ; then
-	    echo "  Clean up."
+	    echo "  Clean up (-o)."
 	    rm -rf $DIR_WORK_JOB
 	elif [ ! -e $DIR_WORK_JOB/out/status.txt ] ; then
 	    echo "  Clean up (no status file)."
