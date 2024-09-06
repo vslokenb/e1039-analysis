@@ -4,6 +4,9 @@ R__LOAD_LIBRARY(RecoData2024)
 int Fun4All(const int run_id, const string dir_in, const string fn_list, const int n_evt=0)
 {
   recoConsts* rc = recoConsts::instance();
+  rc->set_IntFlag("RUNNUMBER", run_id);
+  rc->set_DoubleFlag("FMAGSTR", -1.044);
+  rc->set_DoubleFlag("KMAGSTR", -1.025);
   rc->set_CharFlag("AlignmentMille", "");
   rc->set_CharFlag("AlignmentHodo", "");
   rc->set_CharFlag("AlignmentProp", "");

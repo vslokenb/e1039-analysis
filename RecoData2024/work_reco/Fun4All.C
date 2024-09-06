@@ -5,17 +5,20 @@ R__LOAD_LIBRARY(RecoData2024)
 int Fun4All(const int run_id, const int spill_id, const string DST_in, const string DST_out, const int n_evt=0)
 {
   recoConsts* rc = recoConsts::instance();
+  rc->set_IntFlag("RUNNUMBER", run_id);
+  rc->set_DoubleFlag("FMAGSTR", -1.044);
+  rc->set_DoubleFlag("KMAGSTR", -1.025);
   rc->set_BoolFlag("COARSE_MODE", false);
   rc->set_BoolFlag("REQUIRE_MUID", false);
   rc->set_CharFlag("AlignmentMille", "config/align_mille_v09.txt");
   rc->set_CharFlag("AlignmentHodo", "");
   rc->set_CharFlag("AlignmentProp", "");
   rc->set_CharFlag("Calibration", "");
-  rc->set_IntFlag ("MaxHitsDC0" , 120); // 180); // 350
-  rc->set_IntFlag ("MaxHitsDC1" , 120); // 180); // 350
-  rc->set_IntFlag ("MaxHitsDC2" ,  60); //  90); // 170
-  rc->set_IntFlag ("MaxHitsDC3p",  50); //  70); // 140
-  rc->set_IntFlag ("MaxHitsDC3m",  50); //  70 350m); // 140
+  rc->set_IntFlag ("MaxHitsDC0" , 120); // 350
+  rc->set_IntFlag ("MaxHitsDC1" , 120); // 350
+  rc->set_IntFlag ("MaxHitsDC2" ,  60); // 170
+  rc->set_IntFlag ("MaxHitsDC3p",  50); // 140
+  rc->set_IntFlag ("MaxHitsDC3m",  50); // 140
   
   Fun4AllServer* se = Fun4AllServer::instance();
   se->setRun(run_id);

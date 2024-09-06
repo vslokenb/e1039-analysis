@@ -1,6 +1,7 @@
 #ifndef _ANA_DIMUON__H_
 #define _ANA_DIMUON__H_
 #include <fun4all/SubsysReco.h>
+#include <UtilAna/TrigRoadset.h>
 #include "TreeData.h"
 class TFile;
 class TTree;
@@ -21,6 +22,8 @@ class AnaDimuon: public SubsysReco {
   EventData   m_evt;
   DimuonList  m_dim_list;
 
+  UtilTrigger::TrigRoadset m_rs;
+  
  public:
   AnaDimuon(const std::string& name="AnaDimuon");
   virtual ~AnaDimuon();

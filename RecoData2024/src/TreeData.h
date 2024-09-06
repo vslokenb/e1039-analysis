@@ -21,6 +21,12 @@ struct EventData {
 };
 
 struct DimuonData {
+  int            road_pos;
+  int            road_neg;
+  bool           pos_top;
+  bool           pos_bot;
+  bool           neg_top;
+  bool           neg_bot;
   TVector3       pos;
   TLorentzVector mom;
   short          n_hits_pos;

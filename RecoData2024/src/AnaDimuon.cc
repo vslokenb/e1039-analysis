@@ -52,14 +52,24 @@ int AnaDimuon::InitRun(PHCompositeNode* topNode)
   m_tree->Branch("event"      , &m_evt);
   m_tree->Branch("dimuon_list", &m_dim_list);
 
+  SQRun* sq_run = findNode::getClass<SQRun>(topNode, "SQRun");
+  if (!sq_run) return Fun4AllReturnCodes::ABORTEVENT;
+  int LBtop = sq_run->get_v1495_id(2);
+  int LBbot = sq_run->get_v1495_id(3);
+  int ret = m_rs.LoadConfig(LBtop, LBbot);
+  if (ret != 0) {
+    cout << "!!WARNING!!  OnlMonTrigEP::InitRunOnlMon():  roadset.LoadConfig returned " << ret << ".\n";
+  }
+  cout <<"Roadset " << m_rs.str(1) << endl;
+
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
 int AnaDimuon::process_event(PHCompositeNode* topNode)
 {
-  if (! m_sq_evt->get_trigger(SQEvent::MATRIX1)) {
-    return Fun4AllReturnCodes::EVENT_OK;
-  }
+  //if (! m_sq_evt->get_trigger(SQEvent::MATRIX1)) {
+  //  return Fun4AllReturnCodes::EVENT_OK;
+  //}
 
   m_evt.run_id    = m_sq_evt->get_run_id();
   m_evt.spill_id  = m_sq_evt->get_spill_id();
@@ -83,8 +93,22 @@ int AnaDimuon::process_event(PHCompositeNode* topNode)
     SRecDimuon sdim = m_srec->getDimuon(i_dim);
     SRecTrack trk_pos = m_srec->getTrack(sdim.get_track_id_pos());
     SRecTrack trk_neg = m_srec->getTrack(sdim.get_track_id_neg());
-    
+
+    int road_pos = trk_pos.getTriggerRoad();
+    int road_neg = trk_neg.getTriggerRoad();
+    bool pos_top = m_rs.PosTop()->FindRoad(road_pos);
+    bool pos_bot = m_rs.PosBot()->FindRoad(road_pos);
+    bool neg_top = m_rs.NegTop()->FindRoad(road_neg);
+    bool neg_bot = m_rs.NegBot()->FindRoad(road_neg);
+    //cout << "T " << road_pos << " " << road_neg << " " << pos_top << pos_bot << neg_top << neg_bot << endl;
+
     DimuonData dd;
+    dd.road_pos   = road_pos;
+    dd.road_neg   = road_neg;
+    dd.pos_top    = pos_top;
+    dd.pos_bot    = pos_bot;
+    dd.neg_top    = neg_top;
+    dd.neg_bot    = neg_bot;
     dd.pos        = sdim.get_pos();
     dd.mom        = sdim.get_mom();
     dd.n_hits_pos = trk_pos.get_num_hits();
@@ -120,19 +144,19 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
   TH1* h1_nhit_pos = new TH1D("h1_nhit_pos", "#mu^{+};N of hits/track;", 6, 12.5, 18.5);
   TH1* h1_chi2_pos = new TH1D("h1_chi2_pos", "#mu^{+};Track #chi^{2};", 100, 0, 2);
   TH1* h1_z_pos    = new TH1D("h1_z_pos"   , "#mu^{+};Track z (cm);"  , 100, -500, 500);
-  TH1* h1_pz_pos   = new TH1D("h1_pz_pos"  , "#mu^{+};Track p_{z} (GeV);", 100, 20, 120);
+  TH1* h1_pz_pos   = new TH1D("h1_pz_pos"  , "#mu^{+};Track p_{z} (GeV);", 100, 0, 100);
 
   TH1* h1_nhit_neg = new TH1D("h1_nhit_neg", "#mu^{+};N of hits/track;", 6, 12.5, 18.5);
   TH1* h1_chi2_neg = new TH1D("h1_chi2_neg", "#mu^{+};Track #chi^{2};", 100, 0, 2);
   TH1* h1_z_neg    = new TH1D("h1_z_neg"   , "#mu^{+};Track z (cm);", 100, -500, 500);
-  TH1* h1_pz_neg   = new TH1D("h1_pz_neg"  , "#mu^{+};Track p_{z} (GeV);", 100, 20, 120);
+  TH1* h1_pz_neg   = new TH1D("h1_pz_neg"  , "#mu^{+};Track p_{z} (GeV);", 100, 0, 100);
 
   TH1* h1_dx  = new TH1D("h1_dx" , ";Dimuon x (cm);", 100, -1, 1);
   TH1* h1_dy  = new TH1D("h1_dy" , ";Dimuon y (cm);", 100, -1, 1);
   TH1* h1_dz  = new TH1D("h1_dz" , ";Dimuon z (cm);", 100, -500, 500);
   TH1* h1_dpx = new TH1D("h1_dpx", ";Dimuon p_{x} (GeV);", 100, -5, 5);
   TH1* h1_dpy = new TH1D("h1_dpy", ";Dimuon p_{y} (GeV);", 100, -5, 5);
-  TH1* h1_dpz = new TH1D("h1_dpz", ";Dimuon p_{z} (GeV);", 100, 20, 120);
+  TH1* h1_dpz = new TH1D("h1_dpz", ";Dimuon p_{z} (GeV);", 100, 30, 130);
   TH1* h1_m   = new TH1D("h1_m"  , ";Dimuon mass (GeV);", 100, 0, 10);
 
   //GeomSvc* geom = GeomSvc::instance();
@@ -148,9 +172,17 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
   for (int i_ent = 0; i_ent < n_ent; i_ent++) {
     if ((i_ent+1) % (n_ent/10) == 0) cout << "  " << 10*(i_ent+1)/(n_ent/10) << "%" << flush;
     tree->GetEntry(i_ent);
+
+    if (! (evt->fpga_bits & 0x1)) continue;
+    //if (! (evt->nim_bits & 0x4)) continue;
+    
     for (auto it = dim_list->begin(); it != dim_list->end(); it++) {
       DimuonData* dd = &(*it);
-
+      bool top_bot = dd->pos_top && dd->neg_bot;
+      bool bot_top = dd->pos_bot && dd->neg_top;
+      //cout << "d " << top_bot << bot_top << endl;
+      if (!top_bot && !bot_top) continue;
+      
       h1_nhit_pos->Fill(dd->n_hits_pos);
       h1_chi2_pos->Fill(dd->chisq_pos);
       h1_z_pos   ->Fill(dd->pos_pos.Z());
