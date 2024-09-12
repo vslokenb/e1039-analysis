@@ -141,6 +141,11 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
 {
   cout << "N of trees = " << tree->GetNtrees() << endl;
 
+  TH1* h1_D1  = new TH1D("h1_D1" ,  ";D1 occupancy;N of events", 500, -0.5, 499.5);
+  TH1* h1_D2  = new TH1D("h1_D2" ,  ";D2 occupancy;N of events", 300, -0.5, 299.5);
+  TH1* h1_D3p = new TH1D("h1_D3p", ";D3p occupancy;N of events", 300, -0.5, 299.5);
+  TH1* h1_D3m = new TH1D("h1_D3m", ";D3m occupancy;N of events", 300, -0.5, 299.5);
+  
   TH1* h1_nhit_pos = new TH1D("h1_nhit_pos", "#mu^{+};N of hits/track;", 6, 12.5, 18.5);
   TH1* h1_chi2_pos = new TH1D("h1_chi2_pos", "#mu^{+};Track #chi^{2};", 100, 0, 2);
   TH1* h1_z_pos    = new TH1D("h1_z_pos"   , "#mu^{+};Track z (cm);"  , 100, -500, 500);
@@ -175,13 +180,23 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
 
     if (! (evt->fpga_bits & 0x1)) continue;
     //if (! (evt->nim_bits & 0x4)) continue;
+
+    h1_D1 ->Fill(evt->D1 );
+    h1_D2 ->Fill(evt->D2 );
+    h1_D3p->Fill(evt->D3p);
+    h1_D3m->Fill(evt->D3m);
+    //if (evt->D1 > 120 || evt->D2 > 60 || evt->D3p > 50 || evt->D3m > 50) continue;
     
     for (auto it = dim_list->begin(); it != dim_list->end(); it++) {
       DimuonData* dd = &(*it);
-      bool top_bot = dd->pos_top && dd->neg_bot;
-      bool bot_top = dd->pos_bot && dd->neg_top;
-      //cout << "d " << top_bot << bot_top << endl;
-      if (!top_bot && !bot_top) continue;
+      //bool top_bot = dd->pos_top && dd->neg_bot;
+      //bool bot_top = dd->pos_bot && dd->neg_top;
+      ////cout << "d " << top_bot << bot_top << endl;
+      //if (!top_bot && !bot_top) continue;
+
+      //cout << evt->run_id << " " << evt->spill_id << " " << evt->event_id << " "
+      //     << evt-> D1 << " " << evt-> D2 << " " << evt-> D3p << " " << evt-> D3m << " "
+      //     << dd->pos.Z() << " " << dd->mom.M() << endl;
       
       h1_nhit_pos->Fill(dd->n_hits_pos);
       h1_chi2_pos->Fill(dd->chisq_pos);
@@ -193,16 +208,16 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
       h1_z_neg   ->Fill(dd->pos_neg.Z());
       h1_pz_neg  ->Fill(dd->mom_neg.Z());
 
-      if (dd->n_hits_pos >= 15 && dd->pos_pos.Z() > -490 &&
-          dd->n_hits_neg >= 15 && dd->pos_neg.Z() > -490   ) {
-        h1_dx ->Fill(dd->pos.X());
-        h1_dy ->Fill(dd->pos.Y());
-        h1_dz ->Fill(dd->pos.Z());
-        h1_dpx->Fill(dd->mom.X());
-        h1_dpy->Fill(dd->mom.Y());
-        h1_dpz->Fill(dd->mom.Z());
-        h1_m  ->Fill(dd->mom.M());
-      }
+      if (dd->n_hits_pos < 15 || dd->pos_pos.Z() < -490 ||
+          dd->n_hits_neg < 15 || dd->pos_neg.Z() < -490   ) continue;
+
+      h1_dx ->Fill(dd->pos.X());
+      h1_dy ->Fill(dd->pos.Y());
+      h1_dz ->Fill(dd->pos.Z());
+      h1_dpx->Fill(dd->mom.X());
+      h1_dpy->Fill(dd->mom.Y());
+      h1_dpz->Fill(dd->mom.Z());
+      h1_m  ->Fill(dd->mom.M());
     }
   }
   
@@ -211,6 +226,15 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
   c1->SetGrid();
   //c1->SetLogy(true);
 
+  h1_D1->Draw();
+  c1->SaveAs("result/h1_D1.png");
+  h1_D2->Draw();
+  c1->SaveAs("result/h1_D2.png");
+  h1_D3p->Draw();
+  c1->SaveAs("result/h1_D3p.png");
+  h1_D3m->Draw();
+  c1->SaveAs("result/h1_D3m.png");
+  
   h1_nhit_pos->Draw();
   c1->SaveAs("result/h1_nhit_pos.png");  
   h1_chi2_pos->Draw();

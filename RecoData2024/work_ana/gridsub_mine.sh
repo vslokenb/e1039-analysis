@@ -80,6 +80,7 @@ for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
     for SPILL in $(awk "{if (\$1==$RUN) print \$2;}" $DIR_MACRO/$FN_LIST) ; do
 	SPILL9=$(printf '%09d' $SPILL)
 	BASE_NAME=run_${RUN6}_spill_${SPILL9}_spin_reco
+	test -e $DIR_DST/run_$RUN6/spill_$SPILL9/out/$BASE_NAME.root || continue
 	echo -e "$SPILL\t$BASE_NAME"
     done >$DIR_WORK_JOB/in/$FN_LIST_IN
     

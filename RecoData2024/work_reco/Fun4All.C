@@ -14,17 +14,23 @@ int Fun4All(const int run_id, const int spill_id, const string DST_in, const str
   rc->set_CharFlag("AlignmentHodo", "");
   rc->set_CharFlag("AlignmentProp", "");
   rc->set_CharFlag("Calibration", "");
-  rc->set_IntFlag ("MaxHitsDC0" , 120); // 350
-  rc->set_IntFlag ("MaxHitsDC1" , 120); // 350
-  rc->set_IntFlag ("MaxHitsDC2" ,  60); // 170
-  rc->set_IntFlag ("MaxHitsDC3p",  50); // 140
-  rc->set_IntFlag ("MaxHitsDC3m",  50); // 140
+  rc->set_IntFlag ("MaxHitsDC0" , int(350/2.0)); // 120); // 350
+  rc->set_IntFlag ("MaxHitsDC1" , int(350/2.0)); // 120); // 350
+  rc->set_IntFlag ("MaxHitsDC2" , int(170/2.0)); //  60); // 170
+  rc->set_IntFlag ("MaxHitsDC3p", int(140/2.0)); //  50); // 140
+  rc->set_IntFlag ("MaxHitsDC3m", int(140/2.0)); //  50); // 140
   
   Fun4AllServer* se = Fun4AllServer::instance();
   se->setRun(run_id);
   //se->Verbosity(1);
 
-  se->registerSubsystem(new CalibDriftDist());
+  CalibHitElementPos* cal_ele_pos = new CalibHitElementPos();
+  cal_ele_pos->CalibTriggerHit(false);
+  se->registerSubsystem(cal_ele_pos);
+  
+  CalibDriftDist* cal_dd = new CalibDriftDist();
+  //cal_dd->Verbosity(999);
+  se->registerSubsystem(cal_dd);
 
   SQReco* reco = new SQReco();
   //reco->Verbosity(999);

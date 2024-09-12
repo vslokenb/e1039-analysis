@@ -1,6 +1,7 @@
 #!/bin/bash
 DIR_MACRO=$(dirname $(readlink -f $BASH_SOURCE))
-DIR_DST=/pnfs/e1039/persistent/users/spinquestpro/commisioning_recodata/CoarseFalse/KMagOn/Occu3
+#DIR_DST=/pnfs/e1039/persistent/users/spinquestpro/commisioning_recodata/CoarseFalse/KMagOn/Occu3
+DIR_DST=/pnfs/e1039/persistent/users/spinquestpro/commisioning_recodata/CoarseFalse/GoodRuns
 
 JOB_NAME=ana
 DO_OVERWRITE=no
@@ -79,8 +80,9 @@ for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
     FN_LIST_IN=list_input.txt
     for SPILL in $(awk "{if (\$1==$RUN) print \$2;}" $DIR_MACRO/$FN_LIST) ; do
 	BASE_NAME=run_${RUN6}_spill_$(printf '%09d' $SPILL)_spin
+	test -e $DIR_DST/run_$RUN6/$BASE_NAME/out/DST.root || continue
 	echo -e "$SPILL\t$BASE_NAME"
-	cp -p $DIR_DST/run_${RUN6}/$BASE_NAME/out/result.root $DIR_WORK_JOB/in/$BASE_NAME.root # Symbolic link (ln -s) doesn't work since it is ignored when given to '-f'.
+	cp $DIR_DST/run_$RUN6/$BASE_NAME/out/DST.root $DIR_WORK_JOB/in/$BASE_NAME.root # Symbolic link (ln -s) doesn't work since it is ignored when given to '-f'.
     done >$DIR_WORK_JOB/in/$FN_LIST_IN
     
     if [ $USE_GRID == yes ]; then
