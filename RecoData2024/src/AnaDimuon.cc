@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iomanip>
 #include <TSystem.h>
 #include <TFile.h>
@@ -140,6 +141,8 @@ int AnaDimuon::End(PHCompositeNode* topNode)
 void AnaDimuon::AnalyzeTree(TChain* tree)
 {
   cout << "N of trees = " << tree->GetNtrees() << endl;
+  gSystem->mkdir("result", true);
+  ofstream ofs("result/result.txt");
 
   TH1* h1_D1  = new TH1D("h1_D1" ,  ";D1 occupancy;N of events", 500, -0.5, 499.5);
   TH1* h1_D2  = new TH1D("h1_D2" ,  ";D2 occupancy;N of events", 300, -0.5, 299.5);
@@ -178,7 +181,8 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
     if ((i_ent+1) % (n_ent/10) == 0) cout << "  " << 10*(i_ent+1)/(n_ent/10) << "%" << flush;
     tree->GetEntry(i_ent);
 
-    if (! (evt->fpga_bits & 0x1)) continue;
+    //if (evt->run_id != 6155 || evt->spill_id != 1941910) continue;
+    //if (! (evt->fpga_bits & 0x1)) continue;
     //if (! (evt->nim_bits & 0x4)) continue;
 
     h1_D1 ->Fill(evt->D1 );
@@ -194,9 +198,9 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
       ////cout << "d " << top_bot << bot_top << endl;
       //if (!top_bot && !bot_top) continue;
 
-      //cout << evt->run_id << " " << evt->spill_id << " " << evt->event_id << " "
-      //     << evt-> D1 << " " << evt-> D2 << " " << evt-> D3p << " " << evt-> D3m << " "
-      //     << dd->pos.Z() << " " << dd->mom.M() << endl;
+      ofs << evt->run_id << " " << evt->spill_id << " " << evt->event_id << " "
+          << evt->D1 << " " << evt->D2 << " " << evt->D3p << " " << evt->D3m << " "
+          << dd->pos.Z() << " " << dd->mom.M() << endl;
       
       h1_nhit_pos->Fill(dd->n_hits_pos);
       h1_chi2_pos->Fill(dd->chisq_pos);
@@ -221,7 +225,6 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
     }
   }
   
-  gSystem->mkdir("result", true);
   TCanvas* c1 = new TCanvas("c1", "");
   c1->SetGrid();
   //c1->SetLogy(true);
@@ -269,5 +272,7 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
   c1->SaveAs("result/h1_m.png");
 
   delete c1;
+
+  ofs.close();
 }
 

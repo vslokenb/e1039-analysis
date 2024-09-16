@@ -10,15 +10,15 @@ int Fun4All(const int run_id, const int spill_id, const string DST_in, const str
   rc->set_DoubleFlag("KMAGSTR", -1.025);
   rc->set_BoolFlag("COARSE_MODE", false);
   rc->set_BoolFlag("REQUIRE_MUID", false);
-  rc->set_CharFlag("AlignmentMille", "config/align_mille_v09.txt");
+  rc->set_CharFlag("AlignmentMille", "config/align_mille_v10.txt");
   rc->set_CharFlag("AlignmentHodo", "");
   rc->set_CharFlag("AlignmentProp", "");
   rc->set_CharFlag("Calibration", "");
-  rc->set_IntFlag ("MaxHitsDC0" , int(350/2.0)); // 120); // 350
-  rc->set_IntFlag ("MaxHitsDC1" , int(350/2.0)); // 120); // 350
-  rc->set_IntFlag ("MaxHitsDC2" , int(170/2.0)); //  60); // 170
-  rc->set_IntFlag ("MaxHitsDC3p", int(140/2.0)); //  50); // 140
-  rc->set_IntFlag ("MaxHitsDC3m", int(140/2.0)); //  50); // 140
+  rc->set_IntFlag ("MaxHitsDC0" , int(350/3.0)); // 120); // 350
+  rc->set_IntFlag ("MaxHitsDC1" , int(350/3.0)); // 120); // 350
+  rc->set_IntFlag ("MaxHitsDC2" , int(170/3.0)); //  60); // 170
+  rc->set_IntFlag ("MaxHitsDC3p", int(140/3.0)); //  50); // 140
+  rc->set_IntFlag ("MaxHitsDC3m", int(140/3.0)); //  50); // 140
   
   Fun4AllServer* se = Fun4AllServer::instance();
   se->setRun(run_id);
@@ -35,8 +35,9 @@ int Fun4All(const int run_id, const int spill_id, const string DST_in, const str
   SQReco* reco = new SQReco();
   //reco->Verbosity(999);
   reco->set_legacy_rec_container(true);
-  reco->set_geom_file_name("config/geom.root");
-  reco->set_enable_KF(false);
+  //reco->set_geom_file_name("config/geom.root");
+  reco->set_geom_file_name((string)gSystem->Getenv("E1039_RESOURCE") + "/geometry/geom_run005433.root");
+  reco->set_enable_KF(true);
   reco->setInputTy(SQReco::E1039);
   reco->setFitterTy(SQReco::KFREF);
   reco->set_evt_reducer_opt("none");

@@ -1,7 +1,7 @@
 #!/bin/bash
 DIR_MACRO=$(dirname $(readlink -f $BASH_SOURCE))
-#DIR_DST=/pnfs/e1039/persistent/users/spinquestpro/commisioning_recodata/CoarseFalse/KMagOn/Occu3
-DIR_DST=/pnfs/e1039/persistent/users/spinquestpro/commisioning_recodata/CoarseFalse/GoodRuns
+#DIR_DST=/pnfs/e1039/persistent/users/spinquestpro/commisioning_recodata/CoarseFalse/GoodRuns
+DIR_DST=/pnfs/e1039/persistent/users/ckuruppu/commisioning_recodata/GoodRuns2
 
 JOB_NAME=ana
 DO_OVERWRITE=no

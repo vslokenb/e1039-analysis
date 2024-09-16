@@ -50,7 +50,7 @@ int Fun4Sim(const int nevent = 10)
   const bool SQ_vtx_gen = true;
   
   recoConsts *rc = recoConsts::instance();
-  rc->set_IntFlag("RUNNUMBER", 4453); /// The geometry is selected based on run number.
+  rc->set_IntFlag("RUNNUMBER", 5433); /// The geometry is selected based on run number.
   rc->set_DoubleFlag("FMAGSTR", FMAGSTR);
   rc->set_DoubleFlag("KMAGSTR", KMAGSTR);
   rc->set_DoubleFlag("SIGX_BEAM", 0.3);
