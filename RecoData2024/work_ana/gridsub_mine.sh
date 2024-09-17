@@ -2,7 +2,7 @@
 DIR_MACRO=$(dirname $(readlink -f $BASH_SOURCE))
 DIR_DST=/pnfs/e1039/scratch/users/$USER/RecoData2024/reco
 
-JOB_NAME=ana
+JOB_NAME=ana_mine
 DO_OVERWRITE=no
 USE_GRID=no
 JOB_B=1

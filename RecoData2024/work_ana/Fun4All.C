@@ -7,7 +7,7 @@ int Fun4All(const int run_id, const string dir_in, const string fn_list, const i
   rc->set_IntFlag("RUNNUMBER", run_id);
   rc->set_DoubleFlag("FMAGSTR", -1.044);
   rc->set_DoubleFlag("KMAGSTR", -1.025);
-  rc->set_CharFlag("AlignmentMille", "");
+  rc->set_CharFlag("AlignmentMille", "config/align_mille_v10.txt");
   rc->set_CharFlag("AlignmentHodo", "");
   rc->set_CharFlag("AlignmentProp", "");
   rc->set_CharFlag("Calibration", "");

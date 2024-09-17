@@ -31,10 +31,16 @@ struct DimuonData {
   TLorentzVector mom;
   short          n_hits_pos;
   double         chisq_pos ;
+  double         chisq_target_pos;
+  double         chisq_dump_pos;
+  double         chisq_upstream_pos;
   TVector3       pos_pos   ;
   TLorentzVector mom_pos   ;
   short          n_hits_neg;
   double         chisq_neg ;
+  double         chisq_target_neg;
+  double         chisq_dump_neg;
+  double         chisq_upstream_neg;
   TVector3       pos_neg   ;
   TLorentzVector mom_neg   ;
   
