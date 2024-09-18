@@ -36,6 +36,8 @@ struct DimuonData {
   double         chisq_upstream_pos;
   TVector3       pos_pos   ;
   TLorentzVector mom_pos   ;
+  TVector3       pos_target_pos;
+  TVector3       pos_dump_pos;
   short          n_hits_neg;
   double         chisq_neg ;
   double         chisq_target_neg;
@@ -43,6 +45,8 @@ struct DimuonData {
   double         chisq_upstream_neg;
   TVector3       pos_neg   ;
   TLorentzVector mom_neg   ;
+  TVector3       pos_target_neg;
+  TVector3       pos_dump_neg;
   
   DimuonData();
   virtual ~DimuonData() {;}

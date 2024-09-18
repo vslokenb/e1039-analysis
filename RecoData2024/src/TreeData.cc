@@ -31,6 +31,8 @@ DimuonData::DimuonData()
   , chisq_upstream_pos(0)
   , pos_pos   (0,0,0)
   , mom_pos   (0,0,0,0)
+  , pos_target_pos(0,0,0)
+  , pos_dump_pos  (0,0,0)
   , n_hits_neg(0)
   , chisq_neg (0)
   , chisq_target_neg  (0)
@@ -38,6 +40,8 @@ DimuonData::DimuonData()
   , chisq_upstream_neg(0)
   , pos_neg   (0,0,0)
   , mom_neg   (0,0,0,0)
+  , pos_target_neg(0,0,0)
+  , pos_dump_neg  (0,0,0)
 {
   ;
 }
