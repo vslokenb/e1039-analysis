@@ -1,3 +1,4 @@
+//R__LOAD_LIBRARY(libktracker)
 R__LOAD_LIBRARY(RecoData2024)
 
 /// Fun4All macro to analyze spill-by-spill DST files of multiple runs.
@@ -15,6 +16,10 @@ int Fun4All(const int run_id, const string dir_in, const string fn_list, const i
   Fun4AllServer* se = Fun4AllServer::instance();
   se->setRun(run_id);
   //se->Verbosity(1);
+
+  //VertexFit* vtx_fit = new VertexFit();
+  //vtx_fit->enable_fit_target_center();
+  //se->registerSubsystem(vtx_fit);
 
   se->registerSubsystem(new AnaDimuon());
 

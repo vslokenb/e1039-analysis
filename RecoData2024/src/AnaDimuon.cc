@@ -114,7 +114,7 @@ int AnaDimuon::process_event(PHCompositeNode* topNode)
     dd.mom                = sdim.get_mom();
     dd.n_hits_pos         = trk_pos.get_num_hits();
     dd.chisq_pos          = trk_pos.get_chisq();
-    dd.chisq_target_pos   = trk_pos.get_chisq_target();
+    dd.chisq_target_pos   = trk_pos.getChisqTarget();//get_chisq_target();
     dd.chisq_dump_pos     = trk_pos.get_chisq_dump();
     dd.chisq_upstream_pos = trk_pos.get_chsiq_upstream();
     dd.pos_pos            = trk_pos.get_pos_vtx();
@@ -123,7 +123,7 @@ int AnaDimuon::process_event(PHCompositeNode* topNode)
     dd.pos_dump_pos       = trk_pos.get_pos_dump();
     dd.n_hits_neg         = trk_neg.get_num_hits();
     dd.chisq_neg          = trk_neg.get_chisq();
-    dd.chisq_target_neg   = trk_neg.get_chisq_target();
+    dd.chisq_target_neg   = trk_neg.getChisqTarget();//get_chisq_target();
     dd.chisq_dump_neg     = trk_neg.get_chisq_dump();
     dd.chisq_upstream_neg = trk_neg.get_chsiq_upstream();
     dd.pos_neg            = trk_neg.get_pos_vtx();
@@ -171,8 +171,8 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
   TH1* h1_chi2_tgt_pos = new TH1D("h1_chi2_tgt_pos", "#mu^{+};Track #chi^{2} at target;"  , 100, 0, 10);
   TH1* h1_chi2_dum_pos = new TH1D("h1_chi2_dum_pos", "#mu^{+};Track #chi^{2} at dump;"    , 100, 0, 10);
   TH1* h1_chi2_ups_pos = new TH1D("h1_chi2_ups_pos", "#mu^{+};Track #chi^{2} at upstream;", 100, 0, 10);
-  TH1* h1_chi2_tmd_pos = new TH1D("h1_chi2_tmd_pos", "#mu^{+};#chi^{2}_{Target} - #chi^{2}_{Dump};"    , 100, -5, 5);
-  TH1* h1_chi2_tmu_pos = new TH1D("h1_chi2_tmu_pos", "#mu^{+};#chi^{2}_{Target} - #chi^{2}_{Upstream};", 100, -5, 5);
+  TH1* h1_chi2_tmd_pos = new TH1D("h1_chi2_tmd_pos", "#mu^{+};#chi^{2}_{Target} - #chi^{2}_{Dump};"    , 100, -10, 10);
+  TH1* h1_chi2_tmu_pos = new TH1D("h1_chi2_tmu_pos", "#mu^{+};#chi^{2}_{Target} - #chi^{2}_{Upstream};", 100, -10, 10);
   
   TH1* h1_nhit_neg = new TH1D("h1_nhit_neg", "#mu^{-};N of hits/track;", 6, 12.5, 18.5);
   TH1* h1_chi2_neg = new TH1D("h1_chi2_neg", "#mu^{-};Track #chi^{2};", 100, 0, 2);
@@ -186,8 +186,8 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
   TH1* h1_chi2_tgt_neg = new TH1D("h1_chi2_tgt_neg", "#mu^{-};Track #chi^{2} at target;"  , 100, 0, 10);
   TH1* h1_chi2_dum_neg = new TH1D("h1_chi2_dum_neg", "#mu^{-};Track #chi^{2} at dump;"    , 100, 0, 10);
   TH1* h1_chi2_ups_neg = new TH1D("h1_chi2_ups_neg", "#mu^{-};Track #chi^{2} at upstream;", 100, 0, 10);
-  TH1* h1_chi2_tmd_neg = new TH1D("h1_chi2_tmd_neg", "#mu^{-};#chi^{2}_{Target} - #chi^{2}_{Dump};"    , 100, -5, 5);
-  TH1* h1_chi2_tmu_neg = new TH1D("h1_chi2_tmu_neg", "#mu^{-};#chi^{2}_{Target} - #chi^{2}_{Upstream};", 100, -5, 5);
+  TH1* h1_chi2_tmd_neg = new TH1D("h1_chi2_tmd_neg", "#mu^{-};#chi^{2}_{Target} - #chi^{2}_{Dump};"    , 100, -10, 10);
+  TH1* h1_chi2_tmu_neg = new TH1D("h1_chi2_tmu_neg", "#mu^{-};#chi^{2}_{Target} - #chi^{2}_{Upstream};", 100, -10, 10);
   
   TH1* h1_dx  = new TH1D("h1_dx" , ";Dimuon x (cm);", 100, -1, 1);
   TH1* h1_dy  = new TH1D("h1_dy" , ";Dimuon y (cm);", 100, -1, 1);
@@ -214,6 +214,7 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
   for (int i_ent = 0; i_ent < n_ent; i_ent++) {
     if ((i_ent+1) % (n_ent/10) == 0) cout << "  " << 10*(i_ent+1)/(n_ent/10) << "%" << flush;
     tree->GetEntry(i_ent);
+    //ofs << evt->run_id << " " << evt->spill_id << " " << evt->event_id << " " << evt->D1 << " " << evt->D2 << " " << evt->D3p << " " << evt->D3m << endl;
 
     //if (evt->run_id != 6155 || evt->spill_id != 1941910) continue;
     if (! (evt->fpga_bits & 0x1)) continue;
@@ -242,8 +243,7 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
       ofs << evt->run_id << " " << evt->spill_id << " " << evt->event_id << " "
           << evt->D1 << " " << evt->D2 << " " << evt->D3p << " " << evt->D3m << " "
           << dd->pos.Z() << " " << dd->mom.M() << endl;
-      //ofs << chi2_tgt_pos << " " << chi2_dum_pos << " " << chi2_ups_pos << " "
-      //     << chi2_tgt_neg << " " << chi2_dum_neg << " " << chi2_ups_neg << endl;
+      //ofs << chi2_tgt_pos << " " << chi2_dum_pos << " " << chi2_ups_pos << " " << chi2_tgt_neg << " " << chi2_dum_neg << " " << chi2_ups_neg << endl;
       
       h1_nhit_pos->Fill(dd->n_hits_pos);
       h1_chi2_pos->Fill(dd->chisq_pos);
@@ -257,10 +257,6 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
 
       if (dd->n_hits_pos < 15 || dd->pos_pos.Z() < -490 ||
           dd->n_hits_neg < 15 || dd->pos_neg.Z() < -490   ) continue;
-      //if (chi2_tgt_pos < 0 || chi2_dum_pos < 0 || chi2_ups_pos < 0 ||
-      //    chi2_tgt_pos - chi2_dum_pos > 0 || chi2_tgt_pos - chi2_ups_pos > 0) continue;
-      //if (chi2_tgt_neg < 0 || chi2_dum_neg < 0 || chi2_ups_neg < 0 ||
-      //    chi2_tgt_neg - chi2_dum_neg > 0 || chi2_tgt_neg - chi2_ups_neg > 0) continue;
 
       double x_t_pos = dd->pos_target_pos.X();
       double y_t_pos = dd->pos_target_pos.Y();
@@ -298,15 +294,20 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
       h1_dpz->Fill(dd->mom.Z());
       h1_m  ->Fill(dd->mom.M());
 
-      double r_t_pos = sqrt(x_t_pos*x_t_pos + y_t_pos*y_t_pos);
-      double r_d_pos = sqrt(x_d_pos*x_d_pos + y_d_pos*y_d_pos);
-      double r_t_neg = sqrt(x_t_neg*x_t_neg + y_t_neg*y_t_neg);
-      double r_d_neg = sqrt(x_d_neg*x_d_neg + y_d_neg*y_d_neg);
-      if (r_t_pos < r_d_pos && r_t_neg < r_d_neg) {
-        h1_dz_sel ->Fill(dd->pos.Z());
-        h1_dpz_sel->Fill(dd->mom.Z());
-        h1_m_sel  ->Fill(dd->mom.M());
-      }
+      if (chi2_tgt_pos < 0 || chi2_dum_pos < 0 || chi2_ups_pos < 0 ||
+          chi2_tgt_pos - chi2_dum_pos > 0 || chi2_tgt_pos - chi2_ups_pos > 0) continue;
+      if (chi2_tgt_neg < 0 || chi2_dum_neg < 0 || chi2_ups_neg < 0 ||
+          chi2_tgt_neg - chi2_dum_neg > 0 || chi2_tgt_neg - chi2_ups_neg > 0) continue;
+
+      //double r_t_pos = sqrt(x_t_pos*x_t_pos + y_t_pos*y_t_pos);
+      //double r_d_pos = sqrt(x_d_pos*x_d_pos + y_d_pos*y_d_pos);
+      //double r_t_neg = sqrt(x_t_neg*x_t_neg + y_t_neg*y_t_neg);
+      //double r_d_neg = sqrt(x_d_neg*x_d_neg + y_d_neg*y_d_neg);
+      //if (r_t_pos >= r_d_pos || r_t_neg >= r_d_neg) continue;
+      
+      h1_dz_sel ->Fill(dd->pos.Z());
+      h1_dpz_sel->Fill(dd->mom.Z());
+      h1_m_sel  ->Fill(dd->mom.M());
     }
   }
   
