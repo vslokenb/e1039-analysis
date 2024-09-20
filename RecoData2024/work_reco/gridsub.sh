@@ -72,7 +72,10 @@ for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
 	    echo "  Clean up (-o)."
 	    rm -rf $DIR_WORK_JOB
 	elif [ ! -e $DIR_WORK_JOB/out/status.txt ] ; then
-	    echo "  Clean up (no status file)."
+	    echo "  No status file.  Clean up."
+	    rm -rf $DIR_WORK_JOB
+	elif [ ! -e $DIR_WORK_JOB/out/run_${RUN6}_spill_${SPILL9}_spin_reco.root ] ; then
+	    echo "  No DST file.  Clean up."
 	    rm -rf $DIR_WORK_JOB
 	else
 	    echo "  Skip."
@@ -86,6 +89,7 @@ for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
     
     if [ $USE_GRID == yes ]; then
 	CMD="/exp/seaquest/app/software/script/jobsub_submit_spinquest.sh"
+	#CMD+=" --resource-provides=usage_model=DEDICATED,OPPORTUNISTIC"
 	CMD+=" --expected-lifetime='medium'" # medium=8h, short=3h, long=23h
 	CMD+=" -L $DIR_WORK_JOB/log_gridrun.txt"
 	CMD+=" -f $DIR_WORK/input.tar.gz"

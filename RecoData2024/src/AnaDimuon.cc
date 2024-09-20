@@ -43,6 +43,8 @@ int AnaDimuon::Init(PHCompositeNode* topNode)
 
 int AnaDimuon::InitRun(PHCompositeNode* topNode)
 {
+  //GeomSvc* geom = GeomSvc::instance();
+
   m_sq_evt     = findNode::getClass<SQEvent    >(topNode, "SQEvent");
   m_sq_hit_vec = findNode::getClass<SQHitVector>(topNode, "SQHitVector");
   m_srec       = findNode::getClass<SRecEvent  >(topNode, "SRecEvent");
@@ -125,7 +127,7 @@ int AnaDimuon::process_event(PHCompositeNode* topNode)
     dd.chisq_neg          = trk_neg.get_chisq();
     dd.chisq_target_neg   = trk_neg.getChisqTarget();//get_chisq_target();
     dd.chisq_dump_neg     = trk_neg.get_chisq_dump();
-    dd.chisq_upstream_neg = trk_neg.get_chsiq_upstream();
+    dd.chisq_upstream_neg = trk_neg.get_chsiq_upstream(); // not chisq
     dd.pos_neg            = trk_neg.get_pos_vtx();
     dd.mom_neg            = trk_neg.get_mom_vtx();
     dd.pos_target_neg     = trk_neg.get_pos_target();
@@ -134,8 +136,6 @@ int AnaDimuon::process_event(PHCompositeNode* topNode)
     m_dim_list.push_back(dd);
   }
   
-  //GeomSvc* geom = GeomSvc::instance();
-
   m_tree->Fill();
   return Fun4AllReturnCodes::EVENT_OK;
 }
@@ -217,7 +217,7 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
     //ofs << evt->run_id << " " << evt->spill_id << " " << evt->event_id << " " << evt->D1 << " " << evt->D2 << " " << evt->D3p << " " << evt->D3m << endl;
 
     //if (evt->run_id != 6155 || evt->spill_id != 1941910) continue;
-    if (! (evt->fpga_bits & 0x1)) continue;
+    //if (! (evt->fpga_bits & 0x1)) continue;
     //if (! (evt->nim_bits & 0x4)) continue;
 
     h1_D1 ->Fill(evt->D1 );
@@ -228,10 +228,9 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
     
     for (auto it = dim_list->begin(); it != dim_list->end(); it++) {
       DimuonData* dd = &(*it);
-      bool top_bot = dd->pos_top && dd->neg_bot;
-      bool bot_top = dd->pos_bot && dd->neg_top;
-      //cout << "d " << top_bot << bot_top << endl;
-      if (!top_bot && !bot_top) continue;
+      //bool top_bot = dd->pos_top && dd->neg_bot;
+      //bool bot_top = dd->pos_bot && dd->neg_top;
+      //if (!top_bot && !bot_top) continue;
 
       double chi2_tgt_pos = dd->chisq_target_pos;
       double chi2_dum_pos = dd->chisq_dump_pos;
@@ -255,8 +254,8 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
       h1_z_neg   ->Fill(dd->pos_neg.Z());
       h1_pz_neg  ->Fill(dd->mom_neg.Z());
 
-      if (dd->n_hits_pos < 15 || dd->pos_pos.Z() < -490 ||
-          dd->n_hits_neg < 15 || dd->pos_neg.Z() < -490   ) continue;
+      //if (dd->n_hits_pos < 15 || dd->pos_pos.Z() < -490 ||
+      //    dd->n_hits_neg < 15 || dd->pos_neg.Z() < -490   ) continue;
 
       double x_t_pos = dd->pos_target_pos.X();
       double y_t_pos = dd->pos_target_pos.Y();

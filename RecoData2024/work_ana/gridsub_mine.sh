@@ -1,6 +1,7 @@
 #!/bin/bash
 DIR_MACRO=$(dirname $(readlink -f $BASH_SOURCE))
-DIR_DST=/pnfs/e1039/scratch/users/$USER/RecoData2024/reco
+#DIR_DST=/pnfs/e1039/scratch/users/$USER/RecoData2024/reco
+DIR_DST=/pnfs/e1039/scratch/users/kenichi/RecoData2024/reco-20240920
 
 JOB_NAME=ana_mine
 DO_OVERWRITE=no
@@ -86,7 +87,7 @@ for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
     
     if [ $USE_GRID == yes ]; then
 	CMD="/exp/seaquest/app/software/script/jobsub_submit_spinquest.sh"
-	#CMD+=" --resource-provides=usage_model=DEDICATED,OPPORTUNISTIC"
+	CMD+=" --resource-provides=usage_model=DEDICATED,OPPORTUNISTIC"
 	CMD+=" --expected-lifetime='short'" # medium=8h, short=3h, long=23h
 	CMD+=" -L $DIR_WORK_JOB/log_gridrun.txt"
 	CMD+=" -f $DIR_WORK/input.tar.gz"
