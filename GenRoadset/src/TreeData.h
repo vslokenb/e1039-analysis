@@ -11,6 +11,7 @@ struct SignalData {
   double xF;
   double x1;
   double x2;
+  double dz;
   double mom;
   double phi;
   double theta;

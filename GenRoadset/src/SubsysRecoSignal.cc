@@ -68,6 +68,7 @@ int SubsysRecoSignal::process_event(PHCompositeNode* topNode)
     //if (road_pos * road_neg >= 0) continue // Keep only T+B/B+T pairs
 
     UtilDimuon::CalcVar(dim, mo_sig.mass, mo_sig.pT, mo_sig.x1, mo_sig.x2, mo_sig.xF);
+    mo_sig.dz       = dim->get_pos().Z();
     mo_sig.mom      = dim->get_mom().P();
     mo_sig.phi      = dim->get_mom().Phi();
     mo_sig.theta    = dim->get_mom().Theta();

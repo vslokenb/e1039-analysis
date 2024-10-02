@@ -1,18 +1,21 @@
 #!/bin/bash
 DIR_MACRO=$(dirname $(readlink -f $BASH_SOURCE))
 
-#KMAG_POL=+1
-#JOB_NAME=main_v2_H1Xgap # KMag polarity = Normal
+KMAG_POL=+1
+KMAG_SC=1.0
+JOB_NAME=main_v2_H1Xgap # KMag polarity = Normal
 
 #KMAG_POL=-1
+#KMAG_SC=1.0
 #JOB_NAME=main_reverse_H1Xgap # KMag polarity = Reverse
 
 #KMAG_POL=0
+#KMAG_SC=1.0
 #JOB_NAME=main_zero_H1Xgap
 
-KMAG_POL=+1
-KMAG_SC=0.5
-JOB_NAME=main_normal050
+#KMAG_POL=+1
+#KMAG_SC=0.5
+#JOB_NAME=main_normal050
 
 DO_OVERWRITE=no
 USE_GRID=no
