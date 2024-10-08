@@ -64,8 +64,13 @@ for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
     SPILL=${LIST_SPILL[((JOB_I - 1))]}
     RUN6=$(printf "%06d" $RUN)
     SPILL9=$(printf "%09d" $SPILL)
-    DIR_WORK_JOB=$DIR_WORK/run_$RUN6/spill_$SPILL9
+    FN_IN=run_${RUN6}_spill_${SPILL9}_spin.root
+    if [ ! -e $DIR_DST/run_$RUN6/$FN_IN ] ; then
+	echo "  No input DST file.  Skip."
+	continue
+    fi
 
+    DIR_WORK_JOB=$DIR_WORK/run_$RUN6/spill_$SPILL9
     if [ -e $DIR_WORK_JOB ] ; then
 	echo -n "  DIR_WORK_JOB already exists."
 	if [ $DO_OVERWRITE = yes ] ; then
@@ -85,7 +90,6 @@ for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
     
     mkdir -p $DIR_WORK_JOB/out
     cp -p $DIR_MACRO/gridrun.sh $DIR_WORK_JOB
-    FN_IN=run_${RUN6}_spill_${SPILL9}_spin.root
     
     if [ $USE_GRID == yes ]; then
 	CMD="/exp/seaquest/app/software/script/jobsub_submit_spinquest.sh"

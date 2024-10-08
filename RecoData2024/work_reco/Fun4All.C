@@ -10,6 +10,8 @@ int Fun4All(const int run_id, const int spill_id, const string DST_in, const str
   rc->set_DoubleFlag("KMAGSTR", -1.025);
   rc->set_BoolFlag("COARSE_MODE", false);
   rc->set_BoolFlag("REQUIRE_MUID", false);
+  rc->set_CharFlag("HIT_MASK_MODE", "X");
+    
   rc->set_CharFlag("AlignmentMille", "config/align_mille_v10.txt");
   rc->set_CharFlag("AlignmentHodo", "");
   rc->set_CharFlag("AlignmentProp", "");
