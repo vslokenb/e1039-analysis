@@ -1,8 +1,8 @@
 # e1039-analysis/RecoData2024
 
-A sample program to analyze the officially-reconstructed commissioning data.
+A sample program to analyze reconstructed commissioning data.
 It can also carry out the reconstruction with customizable configurations.
-It analyzes the good runs and spills listed in `work/list_run_spill.txt`, which were defined in [DocDB 10854-v2](https://seaquest-docdb.fnal.gov/cgi-bin/sso/ShowDocument?docid=10854&version=2).
+It analyzes the good runs and spills listed in `work_*/list_run_spill.txt`, which you can replace with predefined or custom lists to analyze what you need.
 
 
 ## Shell Environment and Source Code
@@ -21,9 +21,9 @@ make-this
 ```
 
 
-## Analysis of Officially-Reconstructed Data
+## Analysis of Reconstructed Data
 
-The officially-reconstructed data are stored under `/pnfs/e1039/persistent/users/spinquestpro/commisioning_recodata/`.
+There are several versions of reconstructed data ready for your analysis.
 A set of scripts/macros for analysis is prepared under `work_ana/`.
 Its usage is described in `work_ana/README.md`.
 

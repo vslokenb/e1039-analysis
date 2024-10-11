@@ -1,7 +1,7 @@
 # e1039-analysis/RecoData2024/work_reco
 
-Te spill-level data files are stored in `/pnfs/e1039/persistent/users/kenichi/dst`.
-These data are used in this directory, as selected by `DIR_DST` in `gridsub.sh`.
+The spill-level data files are stored in `/pnfs/e1039/persistent/users/kenichi/dst`.
+These data are used for reconstruction, as selected by `DIR_DST` in `gridsub.sh`.
 
 
 ## Test of Reconstruction Using a Few Runs
@@ -42,10 +42,10 @@ kinit
 You might execute `jobsub_q_mine` to monitor the job status, which is an alias of `jobsub_q --group spinquest --user=$USER` defined in `setup.sh`.
 Once you confirm that the jobs are running fine, you submit more jobs for the remaining runs;
 ```
-./gridsub.sh -g -j 11-200
-./gridsub.sh -g -j 201-1000
-./gridsub.sh -g -j 1001-
+./gridsub.sh -g -m 150 -j 11-
 ```
+Here `-m 150` sets the max number of total (idle+running+held) jobs at a time.
+This command takes a long time (like a night) to finish, so you had better execute it on `screen` or in background.
 
 The output files are stored under `data/reco/` in case Grid is used.
 You can analyze them once (almost) all jobs finish;

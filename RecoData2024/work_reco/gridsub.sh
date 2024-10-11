@@ -8,14 +8,16 @@ USE_GRID=no
 JOB_B=1
 JOB_E=1 # 0 = All available signal and/or embedding files
 N_EVT=0 # 0 = All events in each signal+embedding file
+N_JOB_MAX=0 # N of max jobs at a time.  0 = no limit
 OPTIND=1
-while getopts ":n:ogj:e:" OPT ; do
+while getopts ":n:ogj:e:m:" OPT ; do
     case $OPT in
 	n ) JOB_NAME=$OPTARG ;;
 	o ) DO_OVERWRITE=yes ;;
         g ) USE_GRID=yes ;;
         j ) JOB_E=$OPTARG ;;
         e ) N_EVT=$OPTARG ;;
+        m ) N_JOB_MAX=$OPTARG ;;
     esac
 done
 shift $((OPTIND - 1))
@@ -42,6 +44,7 @@ echo "DO_OVERWRITE = $DO_OVERWRITE"
 echo "USE_GRID     = $USE_GRID"
 echo "JOB_B...E    = $JOB_B...$JOB_E"
 echo "N_EVT        = $N_EVT"
+echo "N_JOB_MAX    = $N_JOB_MAX"
 
 ##
 ## Prepare and execute the job submission
@@ -62,6 +65,7 @@ tar czf  $DIR_WORK/input.tar.gz  config *.C ../setup.sh ../inst
 for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
     RUN=${LIST_RUN[((JOB_I - 1))]}
     SPILL=${LIST_SPILL[((JOB_I - 1))]}
+    echo "JOB_I $JOB_I : $RUN $SPILL"
     RUN6=$(printf "%06d" $RUN)
     SPILL9=$(printf "%09d" $SPILL)
     FN_IN=run_${RUN6}_spill_${SPILL9}_spin.root
@@ -92,6 +96,14 @@ for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
     cp -p $DIR_MACRO/gridrun.sh $DIR_WORK_JOB
     
     if [ $USE_GRID == yes ]; then
+	if [ $N_JOB_MAX -gt 0 ] ; then
+	    while true ; do
+		N_JOB=$(jobsub_q --group spinquest --user=$USER | grep 'gridrun.sh' | wc -l)
+		test $N_JOB -lt $N_JOB_MAX && break
+		echo "    N_JOB = $N_JOB >= $N_JOB_MAX.  Sleep 600..."
+		sleep 600
+	    done
+	fi
 	CMD="/exp/seaquest/app/software/script/jobsub_submit_spinquest.sh"
 	#CMD+=" --resource-provides=usage_model=DEDICATED,OPPORTUNISTIC"
 	CMD+=" --expected-lifetime='medium'" # medium=8h, short=3h, long=23h

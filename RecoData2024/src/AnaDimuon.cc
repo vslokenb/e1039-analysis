@@ -213,6 +213,7 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
   TH1* h1_dpy = new TH1D("h1_dpy", ";Dimuon p_{y} (GeV);", 100, -5, 5);
   TH1* h1_dpz = new TH1D("h1_dpz", ";Dimuon p_{z} (GeV);", 100, 30, 130);
   TH1* h1_m   = new TH1D("h1_m"  , ";Dimuon mass (GeV);", 100, 0, 10);
+  TH1* h1_trk_sep = new TH1D("h1_trk_sep", ";Track separation: z_{#mu +} - z_{#mu -} (cm);", 100, -500, 500);
 
   TH1* h1_dz_sel  = new TH1D("h1_dz_sel" , ";Dimuon z (cm);", 100, -500, 500);
   TH1* h1_dpz_sel = new TH1D("h1_dpz_sel", ";Dimuon p_{z} (GeV);", 100, 30, 130);
@@ -246,6 +247,7 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
     for (auto it = dim_list->begin(); it != dim_list->end(); it++) {
       DimuonData* dd = &(*it);
 
+      double trk_sep      = dd->pos_pos.Z() - dd->pos_neg.Z();
       double chi2_tgt_pos = dd->chisq_target_pos;
       double chi2_dum_pos = dd->chisq_dump_pos;
       double chi2_ups_pos = dd->chisq_upstream_pos;
@@ -268,12 +270,13 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
       h1_z_neg   ->Fill(dd->pos_neg.Z());
       h1_pz_neg  ->Fill(dd->mom_neg.Z());
 
-      if (dd->n_hits_pos < 15 || dd->pos_pos.Z() < -490 ||
-          dd->n_hits_neg < 15 || dd->pos_neg.Z() < -490   ) continue;
-
-      bool top_bot = dd->pos_top && dd->neg_bot;
-      bool bot_top = dd->pos_bot && dd->neg_top;
-      if (!top_bot && !bot_top) continue;
+      if (dd->pos_pos.Z() < -490 || dd->pos_neg.Z() < -490) continue;
+      //if (dd->n_hits_pos < 15 || dd->n_hits_neg < 15) continue;
+      //if (fabs(trk_sep) > 200) continue;
+      
+      //bool top_bot = dd->pos_top && dd->neg_bot;
+      //bool bot_top = dd->pos_bot && dd->neg_top;
+      //if (!top_bot && !bot_top) continue;
       
       h1_chi2_tgt_pos->Fill(chi2_tgt_pos);
       h1_chi2_dum_pos->Fill(chi2_dum_pos);
@@ -303,14 +306,15 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
       //h1_x_d_neg->Fill(x_d_neg);
       //h1_y_d_neg->Fill(y_d_neg);
       
-      h1_dx ->Fill(dd->pos.X());
-      h1_dy ->Fill(dd->pos.Y());
-      h1_dz ->Fill(dd->pos.Z());
-      h1_dpx->Fill(dd->mom.X());
-      h1_dpy->Fill(dd->mom.Y());
-      h1_dpz->Fill(dd->mom.Z());
-      h1_m  ->Fill(dd->mom.M());
-
+      h1_dx     ->Fill(dd->pos.X());
+      h1_dy     ->Fill(dd->pos.Y());
+      h1_dz     ->Fill(dd->pos.Z());
+      h1_dpx    ->Fill(dd->mom.X());
+      h1_dpy    ->Fill(dd->mom.Y());
+      h1_dpz    ->Fill(dd->mom.Z());
+      h1_m      ->Fill(dd->mom.M());
+      h1_trk_sep->Fill(trk_sep);
+      
       if (chi2_tgt_pos < 0 || chi2_dum_pos < 0 || chi2_ups_pos < 0 ||
           chi2_tgt_pos - chi2_dum_pos > 0 || chi2_tgt_pos - chi2_ups_pos > 0) continue;
       if (chi2_tgt_neg < 0 || chi2_dum_neg < 0 || chi2_ups_neg < 0 ||
@@ -367,31 +371,33 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
   h1_chi2_tmd_neg->Draw();  c1->SaveAs("result/h1_chi2_tmd_neg.png");
   h1_chi2_tmu_neg->Draw();  c1->SaveAs("result/h1_chi2_tmu_neg.png");
 
-  h1_dx ->Draw();  c1->SaveAs("result/h1_dx.png");
-  h1_dy ->Draw();  c1->SaveAs("result/h1_dy.png");
-  h1_dz ->Draw();  c1->SaveAs("result/h1_dz.png");
-  h1_dpx->Draw();  c1->SaveAs("result/h1_dpx.png");
-  h1_dpy->Draw();  c1->SaveAs("result/h1_dpy.png");
-  h1_dpz->Draw();  c1->SaveAs("result/h1_dpz.png");
-  h1_m  ->Draw();  c1->SaveAs("result/h1_m.png");
+  h1_dx     ->Draw();  c1->SaveAs("result/h1_dx.png");
+  h1_dy     ->Draw();  c1->SaveAs("result/h1_dy.png");
+  h1_dz     ->Draw();  c1->SaveAs("result/h1_dz.png");
+  h1_dpx    ->Draw();  c1->SaveAs("result/h1_dpx.png");
+  h1_dpy    ->Draw();  c1->SaveAs("result/h1_dpy.png");
+  h1_dpz    ->Draw();  c1->SaveAs("result/h1_dpz.png");
+  h1_m      ->Draw();  c1->SaveAs("result/h1_m.png");
+  h1_trk_sep->Draw();  c1->SaveAs("result/h1_trk_sep.png");
 
+  //c1->SetLogy(true);
 
   h1_dz_sel->SetLineColor(kRed);
   h1_dz_sel->SetLineWidth(2);
-  h1_dz    ->Draw();
-  h1_dz_sel->Draw("same");
+  //h1_dz    ->Draw();
+  h1_dz_sel->Draw();//("same");
   c1->SaveAs("result/h1_dz_sel.png");
 
   h1_dpz_sel->SetLineColor(kRed);
   h1_dpz_sel->SetLineWidth(2);
-  h1_dpz    ->Draw();
-  h1_dpz_sel->Draw("same");
+  //h1_dpz    ->Draw();
+  h1_dpz_sel->Draw();//("same");
   c1->SaveAs("result/h1_dpz_sel.png");
 
   h1_m_sel ->SetLineColor(kRed);
   h1_m_sel ->SetLineWidth(2);
-  h1_m    ->Draw();
-  h1_m_sel->Draw("same");
+  //h1_m    ->Draw();
+  h1_m_sel->Draw();//("same");
   c1->SaveAs("result/h1_m_sel.png");
   
   delete c1;
