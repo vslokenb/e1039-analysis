@@ -47,6 +47,8 @@ struct DimuonData {
   TLorentzVector mom_neg   ;
   TVector3       pos_target_neg;
   TVector3       pos_dump_neg;
+  TLorentzVector mom_target; ///< Dimuon momentum with choice = 1.
+  TLorentzVector mom_dump  ; ///< Dimuon momentum with choice = 2.
   
   DimuonData();
   virtual ~DimuonData() {;}

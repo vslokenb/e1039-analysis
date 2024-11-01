@@ -42,6 +42,8 @@ DimuonData::DimuonData()
   , mom_neg   (0,0,0,0)
   , pos_target_neg(0,0,0)
   , pos_dump_neg  (0,0,0)
+  , mom_target(0,0,0,0)
+  , mom_dump  (0,0,0,0)
 {
   ;
 }

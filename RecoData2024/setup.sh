@@ -3,8 +3,7 @@ DIR_BUILD=$DIR_TOP/build
 DIR_INST=$DIR_TOP/inst
 
 #E1039_SHARE_VERSION=20240317
-#E1039_CORE_VERSION=pr.144-al9
-E1039_CORE_VERSION=pr.148
+E1039_CORE_VERSION=pr.150
 FN_SETUP=/exp/seaquest/app/software/osg/software/e1039/this-e1039.sh
 if [ ! -e $FN_SETUP ] ; then # On grid
     FN_SETUP=/cvmfs/seaquest.opensciencegrid.org/seaquest/${FN_SETUP#/exp/seaquest/app/software/osg/}

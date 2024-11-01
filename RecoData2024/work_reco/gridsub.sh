@@ -5,16 +5,18 @@ DIR_DST=/pnfs/e1039/persistent/users/kenichi/dst
 JOB_NAME=reco
 DO_OVERWRITE=no
 USE_GRID=no
+FORCE_PNFS=no
 JOB_B=1
 JOB_E=1 # 0 = All available signal and/or embedding files
 N_EVT=0 # 0 = All events in each signal+embedding file
 N_JOB_MAX=0 # N of max jobs at a time.  0 = no limit
 OPTIND=1
-while getopts ":n:ogj:e:m:" OPT ; do
+while getopts ":n:ogpj:e:m:" OPT ; do
     case $OPT in
 	n ) JOB_NAME=$OPTARG ;;
 	o ) DO_OVERWRITE=yes ;;
         g ) USE_GRID=yes ;;
+	p ) FORCE_PNFS=yes ;;
         j ) JOB_E=$OPTARG ;;
         e ) N_EVT=$OPTARG ;;
         m ) N_JOB_MAX=$OPTARG ;;
@@ -42,6 +44,7 @@ echo "N_DAT        = $N_DAT"
 echo "JOB_NAME     = $JOB_NAME"
 echo "DO_OVERWRITE = $DO_OVERWRITE"
 echo "USE_GRID     = $USE_GRID"
+echo "FORCE_PNFS   = $FORCE_PNFS"
 echo "JOB_B...E    = $JOB_B...$JOB_E"
 echo "N_EVT        = $N_EVT"
 echo "N_JOB_MAX    = $N_JOB_MAX"
@@ -49,7 +52,7 @@ echo "N_JOB_MAX    = $N_JOB_MAX"
 ##
 ## Prepare and execute the job submission
 ##
-if [ $USE_GRID == yes ]; then
+if [ $USE_GRID == yes -o $FORCE_PNFS == yes ]; then
     DIR_DATA=/pnfs/e1039/scratch/users/$USER/RecoData2024
     DIR_WORK=$DIR_DATA/$JOB_NAME
     ln -nfs $DIR_DATA data # for convenience
@@ -107,6 +110,7 @@ for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
 	CMD="/exp/seaquest/app/software/script/jobsub_submit_spinquest.sh"
 	#CMD+=" --resource-provides=usage_model=DEDICATED,OPPORTUNISTIC"
 	CMD+=" --expected-lifetime='medium'" # medium=8h, short=3h, long=23h
+	#CMD+=" --expected-lifetime='long'"
 	CMD+=" -L $DIR_WORK_JOB/log_gridrun.txt"
 	CMD+=" -f $DIR_WORK/input.tar.gz"
 	CMD+=" -f $DIR_DST/run_$RUN6/$FN_IN"

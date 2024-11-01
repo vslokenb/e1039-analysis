@@ -49,9 +49,15 @@ int Fun4All(const int run_id, const int spill_id, const string DST_in, const str
   reco->set_eval_file_name("eval.root");
   se->registerSubsystem(reco);
 
-  VertexFit* vtx_fit = new VertexFit();
-  //vtx_fit->set_eval_file_name(vtxevalloc);
-  se->registerSubsystem(vtx_fit);
+  //VertexFit* vtx_fit = new VertexFit();
+  ////vtx_fit->set_eval_file_name(vtxevalloc);
+  //se->registerSubsystem(vtx_fit);
+
+  SQVertexing* vtx = new SQVertexing();
+  vtx->Verbosity(21);
+  vtx->set_legacy_rec_container(true);
+  //vtx->set_single_retracking(true);
+  se->registerSubsystem(vtx);
   
   se->registerSubsystem(new AnaDimuon());
 

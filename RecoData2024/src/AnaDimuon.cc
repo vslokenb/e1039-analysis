@@ -150,6 +150,11 @@ int AnaDimuon::process_event(PHCompositeNode* topNode)
     dd.pos_target_neg     = trk_neg.get_pos_target();
     dd.pos_dump_neg       = trk_neg.get_pos_dump();
     
+    //sdim.calcVariables(1); // 1 = target
+    dd.mom_target = sdim.p_pos_target + sdim.p_neg_target; // sdim.get_mom();
+    //sdim.calcVariables(2); // 2 = dump
+    dd.mom_dump = sdim.p_pos_dump + sdim.p_neg_dump; // sdim.get_mom();
+    
     m_dim_list.push_back(dd);
   }
   
@@ -178,7 +183,7 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
   
   TH1* h1_nhit_pos = new TH1D("h1_nhit_pos", "#mu^{+};N of hits/track;", 6, 12.5, 18.5);
   TH1* h1_chi2_pos = new TH1D("h1_chi2_pos", "#mu^{+};Track #chi^{2};", 100, 0, 2);
-  TH1* h1_z_pos    = new TH1D("h1_z_pos"   , "#mu^{+};Track z (cm);"  , 100, -500, 500);
+  TH1* h1_z_pos    = new TH1D("h1_z_pos"   , "#mu^{+};Track z (cm);"  , 100, -700, 300);
   TH1* h1_pz_pos   = new TH1D("h1_pz_pos"  , "#mu^{+};Track p_{z} (GeV);", 100, 0, 100);
   //TH1* h1_x_t_pos  = new TH1D("h1_x_t_pos", "#mu^{+};Track x (cm) @ Target;", 100, -50, 50);
   //TH1* h1_y_t_pos  = new TH1D("h1_y_t_pos", "#mu^{+};Track y (cm) @ Target;", 100, -25, 25);
@@ -193,7 +198,7 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
   
   TH1* h1_nhit_neg = new TH1D("h1_nhit_neg", "#mu^{-};N of hits/track;", 6, 12.5, 18.5);
   TH1* h1_chi2_neg = new TH1D("h1_chi2_neg", "#mu^{-};Track #chi^{2};", 100, 0, 2);
-  TH1* h1_z_neg    = new TH1D("h1_z_neg"   , "#mu^{-};Track z (cm);", 100, -500, 500);
+  TH1* h1_z_neg    = new TH1D("h1_z_neg"   , "#mu^{-};Track z (cm);", 100, -700, 300);
   TH1* h1_pz_neg   = new TH1D("h1_pz_neg"  , "#mu^{-};Track p_{z} (GeV);", 100, 0, 100);
   //TH1* h1_x_t_neg  = new TH1D("h1_x_t_neg", "#mu^{-};Track x (cm) @ Target;", 100, -50, 50);
   //TH1* h1_y_t_neg  = new TH1D("h1_y_t_neg", "#mu^{-};Track y (cm) @ Target;", 100, -25, 25);
@@ -208,17 +213,21 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
   
   TH1* h1_dx  = new TH1D("h1_dx" , ";Dimuon x (cm);", 100, -1, 1);
   TH1* h1_dy  = new TH1D("h1_dy" , ";Dimuon y (cm);", 100, -1, 1);
-  TH1* h1_dz  = new TH1D("h1_dz" , ";Dimuon z (cm);", 100, -500, 500);
+  TH1* h1_dz  = new TH1D("h1_dz" , ";Dimuon z (cm);", 100, -700, 300);
   TH1* h1_dpx = new TH1D("h1_dpx", ";Dimuon p_{x} (GeV);", 100, -5, 5);
   TH1* h1_dpy = new TH1D("h1_dpy", ";Dimuon p_{y} (GeV);", 100, -5, 5);
   TH1* h1_dpz = new TH1D("h1_dpz", ";Dimuon p_{z} (GeV);", 100, 30, 130);
   TH1* h1_m   = new TH1D("h1_m"  , ";Dimuon mass (GeV);", 100, 0, 10);
   TH1* h1_trk_sep = new TH1D("h1_trk_sep", ";Track separation: z_{#mu +} - z_{#mu -} (cm);", 100, -500, 500);
 
-  TH1* h1_dz_sel  = new TH1D("h1_dz_sel" , ";Dimuon z (cm);", 100, -500, 500);
+  TH1* h1_dz_sel  = new TH1D("h1_dz_sel" , ";Dimuon z (cm);", 100, -700, 300);
   TH1* h1_dpz_sel = new TH1D("h1_dpz_sel", ";Dimuon p_{z} (GeV);", 100, 30, 130);
   TH1* h1_m_sel   = new TH1D("h1_m_sel"  , ";Dimuon mass (GeV);", 100, 0, 10);
-  
+
+  TH1* h1_dz_tgt  = new TH1D("h1_dz_tgt" , ";Dimuon z (cm);"     , 100, -700, 300);
+  TH1* h1_dpz_tgt = new TH1D("h1_dpz_tgt", ";Dimuon p_{z} (GeV);", 100, 30, 130);
+  TH1* h1_m_tgt   = new TH1D("h1_m_tgt"  , ";Dimuon mass (GeV);" , 100, 0, 10);
+
   //GeomSvc* geom = GeomSvc::instance();
   ostringstream oss;
   
@@ -259,6 +268,8 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
           << evt->D1 << " " << evt->D2 << " " << evt->D3p << " " << evt->D3m << " "
           << dd->pos.Z() << " " << dd->mom.M() << endl;
       //ofs << chi2_tgt_pos << " " << chi2_dum_pos << " " << chi2_ups_pos << " " << chi2_tgt_neg << " " << chi2_dum_neg << " " << chi2_ups_neg << endl;
+
+      //if (dd->n_hits_pos < 14 || dd->n_hits_neg < 14) continue;
       
       h1_nhit_pos->Fill(dd->n_hits_pos);
       h1_chi2_pos->Fill(dd->chisq_pos);
@@ -270,7 +281,7 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
       h1_z_neg   ->Fill(dd->pos_neg.Z());
       h1_pz_neg  ->Fill(dd->mom_neg.Z());
 
-      if (dd->pos_pos.Z() < -490 || dd->pos_neg.Z() < -490) continue;
+      if (dd->pos_pos.Z() < -690 || dd->pos_neg.Z() < -690) continue;
       //if (dd->n_hits_pos < 15 || dd->n_hits_neg < 15) continue;
       //if (fabs(trk_sep) > 200) continue;
       
@@ -329,6 +340,10 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
       h1_dz_sel ->Fill(dd->pos.Z());
       h1_dpz_sel->Fill(dd->mom.Z());
       h1_m_sel  ->Fill(dd->mom.M());
+      
+      h1_dz_tgt ->Fill(dd->pos.Z());
+      h1_dpz_tgt->Fill(dd->mom_target.Z());
+      h1_m_tgt  ->Fill(dd->mom_target.M());
     }
   }
   
@@ -399,6 +414,21 @@ void AnaDimuon::AnalyzeTree(TChain* tree)
   //h1_m    ->Draw();
   h1_m_sel->Draw();//("same");
   c1->SaveAs("result/h1_m_sel.png");
+
+  h1_dz_tgt->SetLineColor(kBlue);
+  h1_dz_tgt->SetLineWidth(2);
+  h1_dz_tgt->Draw();
+  c1->SaveAs("result/h1_dz_tgt.png");
+
+  h1_dpz_tgt->SetLineColor(kBlue);
+  h1_dpz_tgt->SetLineWidth(2);
+  h1_dpz_tgt->Draw();
+  c1->SaveAs("result/h1_dpz_tgt.png");
+
+  h1_m_tgt ->SetLineColor(kBlue);
+  h1_m_tgt ->SetLineWidth(2);
+  h1_m_tgt->Draw();
+  c1->SaveAs("result/h1_m_tgt.png");
   
   delete c1;
 
