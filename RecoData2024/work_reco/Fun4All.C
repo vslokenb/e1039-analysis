@@ -12,7 +12,7 @@ int Fun4All(const int run_id, const int spill_id, const string DST_in, const str
   rc->set_BoolFlag("REQUIRE_MUID", false);
   rc->set_CharFlag("HIT_MASK_MODE", "X");
     
-  rc->set_CharFlag("AlignmentMille", "config/align_mille_v10.txt");
+  rc->set_CharFlag("AlignmentMille", "config/align_mille_v10_a.txt");
   rc->set_CharFlag("AlignmentHodo", "");
   rc->set_CharFlag("AlignmentProp", "");
   rc->set_CharFlag("Calibration", "");
@@ -21,6 +21,11 @@ int Fun4All(const int run_id, const int spill_id, const string DST_in, const str
   rc->set_IntFlag ("MaxHitsDC2" , int(170/3.0)); //  60); // 170
   rc->set_IntFlag ("MaxHitsDC3p", int(140/3.0)); //  50); // 140
   rc->set_IntFlag ("MaxHitsDC3m", int(140/3.0)); //  50); // 140
+  rc->set_DoubleFlag("RejectWinDC0" , 0.3);
+  rc->set_DoubleFlag("RejectWinDC1" , 0.5);
+  rc->set_DoubleFlag("RejectWinDC2" , 0.35);
+  rc->set_DoubleFlag("RejectWinDC3p", 0.24);
+  rc->set_DoubleFlag("RejectWinDC3m", 0.24);
   
   Fun4AllServer* se = Fun4AllServer::instance();
   se->setRun(run_id);
@@ -54,7 +59,7 @@ int Fun4All(const int run_id, const int spill_id, const string DST_in, const str
   //se->registerSubsystem(vtx_fit);
 
   SQVertexing* vtx = new SQVertexing();
-  vtx->Verbosity(21);
+  //vtx->Verbosity(21);
   vtx->set_legacy_rec_container(true);
   //vtx->set_single_retracking(true);
   se->registerSubsystem(vtx);
