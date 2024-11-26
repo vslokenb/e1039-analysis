@@ -1,6 +1,5 @@
 #!/bin/bash
-# https://e906-gat1.fnal.gov/data-summary/e1039/run.php?run_begin=6090&run_end=6100
-DIR_IN=/data2/e1039/dst
+DIR_IN=/pnfs/e1039/persistent/users/kenichi/dst # /data2/e1039/dst
 FN_OUT=list_input.txt
 
 function ParseOneRun {
@@ -16,12 +15,15 @@ function ParseOneRun {
     done
 }
 
-#for RUN in 6096 6097 6098 6099 ; do
-#    ParseOneRun $DIR_IN $RUN
-#done >$FN_OUT
-
-for (( RUN = 6178 ; RUN >= 5462 ; RUN-- )) ; do
-#for (( RUN = 6096 ; RUN <= 6099 ; RUN++ )) ; do
+## In case you process a list of runs
+for RUN in 6155 6156 ; do
     echo "Run $RUN" >/dev/stderr
     ParseOneRun $DIR_IN $RUN
 done >$FN_OUT
+
+## In case you process a range of runs
+#for (( RUN = 6156 ; RUN >= 5846 ; RUN-- )) ; do
+#    echo "Run $RUN" >/dev/stderr
+#    ParseOneRun $DIR_IN $RUN
+#done >$FN_OUT
+

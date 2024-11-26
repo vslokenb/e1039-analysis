@@ -3,6 +3,6 @@
 #pragma link off all function;
 #pragma link off all global;
 
-#pragma link C++ class Fun4AllSRawEventOutputManager-!;
+#pragma link C++ class CalibDriftDistMod-!;
 
 #endif

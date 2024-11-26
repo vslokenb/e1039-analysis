@@ -1,16 +1,16 @@
 cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
 project(RecalRealDst CXX)
 
-file(GLOB          sources ${PROJECT_SOURCE_DIR}/*.cxx)
+file(GLOB          sources ${PROJECT_SOURCE_DIR}/*.cc)
 file(GLOB     dist_headers ${PROJECT_SOURCE_DIR}/*.h)
 file(GLOB non_dist_headers ${PROJECT_SOURCE_DIR}/*LinkDef.h)
 list(REMOVE_ITEM dist_headers ${non_dist_headers})
 
 # ROOT dict generation
 add_custom_command (
-  OUTPUT RecalRealDst_Dict.cxx
+  OUTPUT RecalRealDst_Dict.cc
   COMMAND rootcint
-  ARGS -f RecalRealDst_Dict.cxx -noIncludePaths -inlineInputHeader -c -p
+  ARGS -f RecalRealDst_Dict.cc -noIncludePaths -inlineInputHeader -c -p
     -I${PROJECT_SOURCE_DIR} -I${ROOT_PREFIX}/include
     ${dist_headers}  ${PROJECT_SOURCE_DIR}/LinkDef.h
   DEPENDS ${dist_headers} ${PROJECT_SOURCE_DIR}/LinkDef.h
@@ -29,7 +29,7 @@ execute_process(COMMAND root-config --libs   OUTPUT_VARIABLE ROOT_LINK    OUTPUT
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall ${ROOT_CFLAGS}")
 
-add_library(RecalRealDst SHARED ${sources} RecalRealDst_Dict.cxx)
+add_library(RecalRealDst SHARED ${sources} RecalRealDst_Dict.cc)
 target_link_libraries(RecalRealDst  fun4all interface_main ktracker_interface)
 install(TARGETS RecalRealDst DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 
