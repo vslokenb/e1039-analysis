@@ -16,11 +16,11 @@ int Fun4All(const int run_id, const int spill_id, const string DST_in, const str
   rc->set_CharFlag("AlignmentHodo", "");
   rc->set_CharFlag("AlignmentProp", "");
   rc->set_CharFlag("Calibration", "");
-  rc->set_IntFlag ("MaxHitsDC0" , int(350/3.0)); // 120); // 350
-  rc->set_IntFlag ("MaxHitsDC1" , int(350/3.0)); // 120); // 350
-  rc->set_IntFlag ("MaxHitsDC2" , int(170/3.0)); //  60); // 170
-  rc->set_IntFlag ("MaxHitsDC3p", int(140/3.0)); //  50); // 140
-  rc->set_IntFlag ("MaxHitsDC3m", int(140/3.0)); //  50); // 140
+  rc->set_IntFlag ("MaxHitsDC0" , int(350)); // /3.0
+  rc->set_IntFlag ("MaxHitsDC1" , int(350)); // /3.0
+  rc->set_IntFlag ("MaxHitsDC2" , int(170)); // /3.0
+  rc->set_IntFlag ("MaxHitsDC3p", int(140)); // /3.0
+  rc->set_IntFlag ("MaxHitsDC3m", int(140)); // /3.0
   rc->set_DoubleFlag("RejectWinDC0" , 0.3);
   rc->set_DoubleFlag("RejectWinDC1" , 0.5);
   rc->set_DoubleFlag("RejectWinDC2" , 0.35);
@@ -35,14 +35,19 @@ int Fun4All(const int run_id, const int spill_id, const string DST_in, const str
   cal_ele_pos->CalibTriggerHit(false);
   se->registerSubsystem(cal_ele_pos);
   
+  CalibHodoInTime* cal_hodo = new CalibHodoInTime();
+  cal_hodo->SkipCalibration();
+  cal_hodo->DeleteOutTimeHit();
+  se->registerSubsystem(cal_hodo);
+  
   CalibDriftDist* cal_dd = new CalibDriftDist();
-  //cal_dd->Verbosity(999);
+  cal_dd->Verbosity(999);
+  cal_dd->DeleteOutTimeHit();
   se->registerSubsystem(cal_dd);
 
   SQReco* reco = new SQReco();
-  //reco->Verbosity(999);
-  reco->set_legacy_rec_container(true);
-  //reco->set_geom_file_name("config/geom.root");
+  //reco->Verbosity(99);
+  reco->set_legacy_rec_container(false); // default = true
   reco->set_geom_file_name((string)gSystem->Getenv("E1039_RESOURCE") + "/geometry/geom_run005433.root");
   reco->set_enable_KF(true);
   reco->setInputTy(SQReco::E1039);
@@ -59,12 +64,17 @@ int Fun4All(const int run_id, const int spill_id, const string DST_in, const str
   //se->registerSubsystem(vtx_fit);
 
   SQVertexing* vtx = new SQVertexing();
-  //vtx->Verbosity(21);
-  vtx->set_legacy_rec_container(true);
+  //vtx->Verbosity(99);
+  //vtx->set_legacy_rec_container(true); // default = false
   //vtx->set_single_retracking(true);
   se->registerSubsystem(vtx);
+
+  se->registerSubsystem(new SQVertexing("vtx_pm", +1, +1));
+  se->registerSubsystem(new SQVertexing("vtx_mm", -1, -1));
   
-  se->registerSubsystem(new AnaDimuon());
+  se->registerSubsystem(new AnaDimuonV2());
+  se->registerSubsystem(new AnaDimuonLikeSign("AnaDimuonPP", "PP"));
+  se->registerSubsystem(new AnaDimuonLikeSign("AnaDimuonMM", "MM"));
 
   Fun4AllInputManager* in = new Fun4AllDstInputManager("DSTIN");
   se->registerInputManager(in);
@@ -75,6 +85,7 @@ int Fun4All(const int run_id, const int spill_id, const string DST_in, const str
 
   se->run(n_evt);
   se->End();
+  //rc->WriteToFile("recoConsts.tsv");
   delete se;
   exit(0); //return 0;
 }

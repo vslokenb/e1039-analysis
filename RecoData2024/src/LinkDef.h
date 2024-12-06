@@ -6,7 +6,12 @@
 #pragma link C++ class EventData+;
 #pragma link C++ class DimuonData+;
 #pragma link C++ class DimuonList+;
+#pragma link C++ class TrackData+;
+#pragma link C++ class TrackList+;
 
+#pragma link C++ class AnaTrack-!;
 #pragma link C++ class AnaDimuon-!;
+#pragma link C++ class AnaDimuonV2-!;
+#pragma link C++ class AnaDimuonLikeSign-!;
 
 #endif

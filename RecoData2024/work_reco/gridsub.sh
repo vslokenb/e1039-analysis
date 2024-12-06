@@ -109,8 +109,8 @@ for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
 	fi
 	CMD="/exp/seaquest/app/software/script/jobsub_submit_spinquest.sh"
 	#CMD+=" --resource-provides=usage_model=DEDICATED,OPPORTUNISTIC"
-	CMD+=" --expected-lifetime='medium'" # medium=8h, short=3h, long=23h
-	#CMD+=" --expected-lifetime='long'"
+	#CMD+=" --expected-lifetime='medium'" # medium=8h, short=3h, long=23h
+	CMD+=" --expected-lifetime='long'"
 	CMD+=" -L $DIR_WORK_JOB/log_gridrun.txt"
 	CMD+=" -f $DIR_WORK/input.tar.gz"
 	CMD+=" -f $DIR_DST/run_$RUN6/$FN_IN"

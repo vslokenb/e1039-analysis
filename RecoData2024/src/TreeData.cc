@@ -47,3 +47,21 @@ DimuonData::DimuonData()
 {
   ;
 }
+
+TrackData::TrackData() 
+  : charge(0)
+  , road  (0)
+  , n_hits(0)
+  , chisq (0)
+  , chisq_target  (0)
+  , chisq_dump    (0)
+  , chisq_upstream(0)
+  , pos_vtx(0,0,0)
+  , mom_vtx(0,0,0,0)
+  , pos_st1(0,0,0)
+  , mom_st1(0,0,0,0)
+  , pos_st3(0,0,0)
+  , mom_st3(0,0,0,0)
+{
+  ;
+}

@@ -17,11 +17,12 @@ int Fun4All(const int run_id, const string dir_in, const string fn_list, const i
   se->setRun(run_id);
   //se->Verbosity(1);
 
-  //VertexFit* vtx_fit = new VertexFit();
-  //vtx_fit->enable_fit_target_center();
-  //se->registerSubsystem(vtx_fit);
-
-  se->registerSubsystem(new AnaDimuon());
+  //SQVertexing* vtx = new SQVertexing();
+  //vtx->Verbosity(99);
+  //se->registerSubsystem(vtx);
+  
+  //se->registerSubsystem(new AnaDimuon());
+  se->registerSubsystem(new AnaTrack());
 
   vector<string> list_in;
   ifstream ifs(fn_list);

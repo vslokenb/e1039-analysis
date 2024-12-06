@@ -57,4 +57,26 @@ struct DimuonData {
 
 typedef std::vector<DimuonData> DimuonList;
 
+struct TrackData {
+  short          charge;
+  int            road;
+  short          n_hits;
+  double         chisq ;
+  double         chisq_target;
+  double         chisq_dump;
+  double         chisq_upstream;
+  TVector3       pos_vtx;
+  TLorentzVector mom_vtx;
+  TVector3       pos_st1;
+  TLorentzVector mom_st1;
+  TVector3       pos_st3;
+  TLorentzVector mom_st3;
+  
+  TrackData();
+  virtual ~TrackData() {;}
+  ClassDef(TrackData, 1);
+};
+
+typedef std::vector<TrackData> TrackList;
+
 #endif // _TREE_DATA__H_
