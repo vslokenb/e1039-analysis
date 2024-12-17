@@ -41,7 +41,7 @@ int Fun4All(const int run_id, const int spill_id, const string DST_in, const str
   se->registerSubsystem(cal_hodo);
   
   CalibDriftDist* cal_dd = new CalibDriftDist();
-  cal_dd->Verbosity(999);
+  //cal_dd->Verbosity(999);
   cal_dd->DeleteOutTimeHit();
   se->registerSubsystem(cal_dd);
 
