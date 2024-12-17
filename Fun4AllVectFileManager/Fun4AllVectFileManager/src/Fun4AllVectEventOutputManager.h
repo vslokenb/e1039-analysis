@@ -42,28 +42,27 @@ private:
     SQHitVector* m_hit_vec;
     SQHitVector* m_trig_hit_vec;
 
-  int trig_bits;
-  int RunID;
-  int SpillID;
-  int EventID;
-  int RFID;
-  int TurnID;
-  int Intensity[32];
-  int fpga_triggers[5] = {0};
-  int nim_triggers[5] = {0};
+int runID;
+int spillID;
+int eventID;
+int rfID;
+int turnID;
+int rfIntensities[33];
+int fpgaTriggers[5] = {0};
+int nimTriggers[5] = {0};
 
+std::vector<int> detectorIDs;
+std::vector<int> elementIDs;
+std::vector<double> tdcTimes;
+std::vector<double> driftDistances;
+std::vector<bool> hitsInTime;
 
-  std::vector<int>    DetectorID;
-  std::vector<int>    ElementID;
-  std::vector<double> TdcTime;
-  std::vector<double> DriftDistance;
-  std::vector<bool> hit_in_time;
+std::vector<int> triggerDetectorIDs;
+std::vector<int> triggerElementIDs;
+std::vector<double> triggerTdcTimes;
+std::vector<double> triggerDriftDistances;
+std::vector<bool> triggerHitsInTime;
 
-  std::vector<int>    Trig_DetectorID;
-  std::vector<int>    Trig_ElementID;
-  std::vector<double> Trig_TdcTime;
-  std::vector<double> Trig_DriftDistance;
-  std::vector<bool> Trig_hit_in_time;
 };
 
 #endif /* _FUN4ALL_VECT_EVENT_OUTPUT_MANAGER__H_ */

@@ -94,61 +94,59 @@ Fun4AllVectEventInputManager::~Fun4AllVectEventInputManager()
 
 void Fun4AllVectEventInputManager::VectToE1039() {
 	// Example: Initialize default triggers
-	event_header->set_run_id(RunID);
-	SQSpill* spill = spill_map->get(SpillID);
+	event_header->set_run_id(runID);
+	SQSpill* spill = spill_map->get(spillID);
 	if(!spill) {
 		spill = new SQSpill_v2();
-		spill->set_spill_id(SpillID);
-		spill->set_run_id(RunID);
+		spill->set_spill_id(spillID);
+		spill->set_run_id(runID);
 
 		spill_map->insert(spill);
 		run_header->set_n_spill(spill_map->size());
 	}
-	event_header->set_spill_id(SpillID);
-	event_header->set_event_id(EventID);
+	event_header->set_spill_id(spillID);
+	event_header->set_event_id(eventID);
 	event_header->set_data_quality(0);
-	for(int i = -16; i < 16; ++i) {event_header->set_qie_rf_intensity(i, Intensity[i+16]);} // need to be added
-	//for(int i = -16; i < 16; ++i) {cout << "intensity: "<< Intensity[i+16] <<endl;} // need to be added
+	for(int i = -16; i < 16; ++i) {event_header->set_qie_rf_intensity(i, rfIntensities[i+16]);} // need to be added
+	//for(int i = -16; i < 16; ++i) {cout << "intensity: "<< rfIntensities[i+16] <<endl;} // need to be added
 	
 
 
 	if (event_header) {
 		// Apply the FPGA triggers to the event header
-		event_header->set_trigger(SQEvent::MATRIX1, fpga_triggers[0]);
-		event_header->set_trigger(SQEvent::MATRIX2, fpga_triggers[1]);
-		event_header->set_trigger(SQEvent::MATRIX3, fpga_triggers[2]);
-		event_header->set_trigger(SQEvent::MATRIX4, fpga_triggers[3]);
-		event_header->set_trigger(SQEvent::MATRIX5, fpga_triggers[4]);
+		event_header->set_trigger(SQEvent::MATRIX1, fpgaTriggers[0]);
+		event_header->set_trigger(SQEvent::MATRIX2, fpgaTriggers[1]);
+		event_header->set_trigger(SQEvent::MATRIX3, fpgaTriggers[2]);
+		event_header->set_trigger(SQEvent::MATRIX4, fpgaTriggers[3]);
+		event_header->set_trigger(SQEvent::MATRIX5, fpgaTriggers[4]);
 		// Apply the NIM triggers to the event header
-		event_header->set_trigger(SQEvent::NIM1, nim_triggers[0]);
-		event_header->set_trigger(SQEvent::NIM2, nim_triggers[1]);
-		event_header->set_trigger(SQEvent::NIM3, nim_triggers[2]);
-		event_header->set_trigger(SQEvent::NIM4, nim_triggers[3]);
-		event_header->set_trigger(SQEvent::NIM5, nim_triggers[4]);
+		event_header->set_trigger(SQEvent::NIM1, nimTriggers[0]);
+		event_header->set_trigger(SQEvent::NIM2, nimTriggers[1]);
+		event_header->set_trigger(SQEvent::NIM3, nimTriggers[2]);
+		event_header->set_trigger(SQEvent::NIM4, nimTriggers[3]);
+		event_header->set_trigger(SQEvent::NIM5, nimTriggers[4]);
 	}
 	//we need to fill from all hits vector
-	for (size_t i = 0; i < ElementID->size(); ++i) {
+	for (size_t i = 0; i < elementIDs->size(); ++i) {
 		SQHit* hit = new SQHit_v1();
 		hit->set_hit_id(i);
-		hit->set_detector_id(DetectorID->at(i));
-		hit->set_element_id(ElementID->at(i));
-		hit->set_tdc_time(TdcTime->at(i));
-		hit->set_drift_distance(DriftDistance->at(i));
-		hit->set_in_time(hit_in_time->at(i));
-		//cout << " hit in time: "<< hit_in_time->at(i) <<endl;
-		//cout << "drift dis: " << DriftDistance->at(i) <<endl;
+		hit->set_detector_id(detectorIDs->at(i));
+		hit->set_element_id(elementIDs->at(i));
+		hit->set_tdc_time(tdcTimes->at(i));
+		hit->set_drift_distance(driftDistances->at(i));
+		hit->set_in_time(hitsInTime->at(i));
 		hit_vec->push_back(hit);
 	}
 
 	//we need to fill from the trig-hits vector (need to work on this later)
-	for (size_t i = 0; i < Trig_ElementID->size(); ++i) {
+	for (size_t i = 0; i < triggerElementIDs->size(); ++i) {
 		SQHit* hit = new SQHit_v1();
 		hit->set_hit_id(i);
-		hit->set_detector_id(Trig_DetectorID->at(i));
-		hit->set_element_id(Trig_ElementID->at(i));
-		hit->set_tdc_time( Trig_TdcTime->at(i));
-		hit->set_drift_distance(Trig_DriftDistance->at(i));
-		hit->set_in_time(Trig_hit_in_time->at(i));
+		hit->set_detector_id(triggerDetectorIDs->at(i));
+		hit->set_element_id(triggerElementIDs->at(i));
+		hit->set_tdc_time(triggerTdcTimes->at(i));
+		hit->set_drift_distance(triggerDriftDistances->at(i));
+		hit->set_in_time(triggerHitsInTime->at(i));
 		trig_hit_vec->push_back(hit);
 	}
 }
@@ -187,25 +185,23 @@ int Fun4AllVectEventInputManager::fileopen(const std::string &filenam) {
         std::cerr << "!!ERROR!! Tree " << _tree_name << " not found in file " << filenam << std::endl;
         return -1; 
     }
+_tin->SetBranchAddress("eventID", &eventID);    
+_tin->SetBranchAddress("runID", &runID);    
+_tin->SetBranchAddress("spillID", &spillID);    
+_tin->SetBranchAddress("fpgaTriggers", fpgaTriggers);
+_tin->SetBranchAddress("nimTriggers", nimTriggers);
+_tin->SetBranchAddress("rfIntensities", rfIntensities);
 
-    // Set branch addresses for scalar and vector branches
-    _tin->SetBranchAddress("EventID", &EventID);           
-    _tin->SetBranchAddress("RunID", &RunID);               
-    _tin->SetBranchAddress("SpillID", &SpillID);           
-    _tin->SetBranchAddress("fpga_triggers", fpga_triggers);
-    _tin->SetBranchAddress("nim_triggers", nim_triggers);
-    _tin->SetBranchAddress("Intensity", Intensity);
+_tin->SetBranchAddress("detectorIDs", &detectorIDs);    
+_tin->SetBranchAddress("elementIDs", &elementIDs);    
+_tin->SetBranchAddress("driftDistances", &driftDistances);    
+_tin->SetBranchAddress("tdcTimes", &tdcTimes);    
+_tin->SetBranchAddress("hitsInTime", &hitsInTime);    
 
-    _tin->SetBranchAddress("DetectorID", &DetectorID);     
-    _tin->SetBranchAddress("ElementID", &ElementID);       
-    _tin->SetBranchAddress("DriftDistance", &DriftDistance);       
-    _tin->SetBranchAddress("TdcTime", &TdcTime);           
-    _tin->SetBranchAddress("hit_in_time", &hit_in_time);           
-
-    _tin->SetBranchAddress("Trig_DriftDistance", &Trig_DriftDistance);    
-    _tin->SetBranchAddress("Trig_ElementID", &Trig_ElementID);    
-    _tin->SetBranchAddress("Trig_TdcTime", &Trig_TdcTime);    
-    _tin->SetBranchAddress("Trig_hit_in_time", &Trig_hit_in_time); 
+_tin->SetBranchAddress("triggerDriftDistances", &triggerDriftDistances);    
+_tin->SetBranchAddress("triggerElementIDs", &triggerElementIDs);    
+_tin->SetBranchAddress("triggerTdcTimes", &triggerTdcTimes);    
+_tin->SetBranchAddress("triggerHitsInTime", &triggerHitsInTime);
 
     segment = 0;
     isopen = 1;
@@ -244,15 +240,15 @@ int Fun4AllVectEventInputManager::run(const int nevents) {
     //std::cout << "EventID: "<< EventID<<std::endl;
     //std::cout << "Fpga1 trigger: "<<fpga_triggers[0] <<std::endl;
 
-   SetRunNumber                (RunID);
+   SetRunNumber                (runID);
    mySyncManager->PrdfEvents   (events_thisfile);
-   mySyncManager->SegmentNumber(SpillID);
-   mySyncManager->CurrentEvent (EventID);
+   mySyncManager->SegmentNumber(spillID);
+   mySyncManager->CurrentEvent (eventID);
   
-   syncobject->RunNumber       (RunID);
+   syncobject->RunNumber       (runID);
    syncobject->EventCounter    (events_thisfile);
-   syncobject->SegmentNumber   (SpillID);
-   syncobject->EventNumber     (EventID);
+   syncobject->SegmentNumber   (spillID);
+   syncobject->EventNumber     (eventID);
       VectToE1039();
     if (RejectEvent() != Fun4AllReturnCodes::EVENT_OK) {
         ResetEvent();

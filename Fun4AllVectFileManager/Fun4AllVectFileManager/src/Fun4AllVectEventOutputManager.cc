@@ -53,26 +53,28 @@ if (!m_tree) {
 } else {
     std::cout << "Tree " << m_tree->GetName() << " created successfully." << std::endl;
 }
-    m_tree->Branch("RunID", &RunID, "RunID/I");
-    m_tree->Branch("SpillID", &SpillID, "SpillID/I");
-    m_tree->Branch("EventID", &EventID, "EventID/I");
-    m_tree->Branch("RFID", &RFID, "RFID/I");
-    m_tree->Branch("TurnID", &TurnID, "TurnID/I");
-    m_tree->Branch("Intensity", Intensity, "Intensity[33]/I");
-    m_tree->Branch("fpga_triggers", fpga_triggers, "fpga_triggers[5]/I");
-    m_tree->Branch("nim_triggers", nim_triggers, "nim_triggers[5]/I");
+    
+m_tree->Branch("runID", &runID, "runID/I");
+m_tree->Branch("spillID", &spillID, "spillID/I");
+m_tree->Branch("eventID", &eventID, "eventID/I");
+m_tree->Branch("rfID", &rfID, "rfID/I");
+m_tree->Branch("turnID", &turnID, "turnID/I");
+m_tree->Branch("rfIntensities", rfIntensities, "rfIntensities[33]/I");
+m_tree->Branch("fpgaTriggers", fpgaTriggers, "fpgaTriggers[5]/I");
+m_tree->Branch("nimTriggers", nimTriggers, "nimTriggers[5]/I");
 
-    m_tree->Branch("DetectorID", &DetectorID);
-    m_tree->Branch("ElementID", &ElementID);
-    m_tree->Branch("TdcTime", &TdcTime);
-    m_tree->Branch("DriftDistance", &DriftDistance);
-    m_tree->Branch("hit_in_time", &hit_in_time);
+m_tree->Branch("detectorIDs", &detectorIDs);
+m_tree->Branch("elementIDs", &elementIDs);
+m_tree->Branch("tdcTimes", &tdcTimes);
+m_tree->Branch("driftDistances", &driftDistances);
+m_tree->Branch("hitsInTime", &hitsInTime);
 
-    m_tree->Branch("Trig_DetectorID", &Trig_DetectorID);
-    m_tree->Branch("Trig_ElementID", &Trig_ElementID);
-    m_tree->Branch("Trig_TdcTime", &Trig_TdcTime);
-    m_tree->Branch("Trig_DriftDistance", &Trig_DriftDistance);
-    m_tree->Branch("Trig_hit_in_time", &Trig_hit_in_time);
+m_tree->Branch("triggerDetectorIDs", &triggerDetectorIDs);
+m_tree->Branch("triggerElementIDs", &triggerElementIDs);
+m_tree->Branch("triggerTdcTimes", &triggerTdcTimes);
+m_tree->Branch("triggerDriftDistances", &triggerDriftDistances);
+m_tree->Branch("triggerHitsInTime", &triggerHitsInTime);
+
 
     m_evt = findNode::getClass<SQEvent>(startNode, "SQEvent");
     m_hit_vec = findNode::getClass<SQHitVector>(startNode, "SQHitVector");
@@ -86,53 +88,52 @@ int Fun4AllVectEventOutputManager::Write(PHCompositeNode* startNode) {
 		OpenFile(startNode);
 	}
 	ResetBranches();
-	RunID = m_evt->get_run_id();
-	SpillID = m_evt->get_spill_id();
-	RFID = m_evt->get_qie_rf_id();
-	EventID = m_evt->get_event_id();
-	TurnID = m_evt->get_qie_turn_id();
+	runID = m_evt->get_run_id();
+	spillID = m_evt->get_spill_id();
+	rfID = m_evt->get_qie_rf_id();
+	eventID = m_evt->get_event_id();
+	turnID = m_evt->get_qie_turn_id();
 
-	fpga_triggers[0] = m_evt->get_trigger(SQEvent::MATRIX1);
-	fpga_triggers[1] = m_evt->get_trigger(SQEvent::MATRIX2);
-	fpga_triggers[2] = m_evt->get_trigger(SQEvent::MATRIX3);
-	fpga_triggers[3] = m_evt->get_trigger(SQEvent::MATRIX4);
-	fpga_triggers[4] = m_evt->get_trigger(SQEvent::MATRIX5);
+	fpgaTriggers[0] = m_evt->get_trigger(SQEvent::MATRIX1);
+	fpgaTriggers[1] = m_evt->get_trigger(SQEvent::MATRIX2);
+	fpgaTriggers[2] = m_evt->get_trigger(SQEvent::MATRIX3);
+	fpgaTriggers[3] = m_evt->get_trigger(SQEvent::MATRIX4);
+	fpgaTriggers[4] = m_evt->get_trigger(SQEvent::MATRIX5);
 
-	nim_triggers[0] = m_evt->get_trigger(SQEvent::NIM1);
-	nim_triggers[1] = m_evt->get_trigger(SQEvent::NIM2);
-	nim_triggers[2] = m_evt->get_trigger(SQEvent::NIM3);
-	nim_triggers[3] = m_evt->get_trigger(SQEvent::NIM4);
-	nim_triggers[4] = m_evt->get_trigger(SQEvent::NIM5);
+	nimTriggers[0] = m_evt->get_trigger(SQEvent::NIM1);
+	nimTriggers[1] = m_evt->get_trigger(SQEvent::NIM2);
+	nimTriggers[2] = m_evt->get_trigger(SQEvent::NIM3);
+	nimTriggers[3] = m_evt->get_trigger(SQEvent::NIM4);
+	nimTriggers[4] = m_evt->get_trigger(SQEvent::NIM5);
 
 
 	for (int i = -16; i < 16; ++i) {
+    // cout << "intensity index: i" << i+16 << endl;
+    	rfIntensities[i + 16] = m_evt->get_qie_rf_intensity(i);
+}
 
-		//cout << "intensity intex: i" << i+16 << endl;
-		Intensity[i+16] = m_evt->get_qie_rf_intensity(i);
-	}
+if (m_hit_vec) {
+    for (int ihit = 0; ihit < m_hit_vec->size(); ++ihit) {
+        SQHit* hit = m_hit_vec->at(ihit);
+        detectorIDs.push_back(hit->get_detector_id());
+        elementIDs.push_back(hit->get_element_id());
+        tdcTimes.push_back(hit->get_tdc_time());
+        driftDistances.push_back(hit->get_drift_distance());
+        // cout << "get drift distance: " << hit->get_drift_distance() << endl;
+        hitsInTime.push_back(hit->is_in_time());
+    }
+}
 
-	if (m_hit_vec) {
-		for (int ihit = 0; ihit < m_hit_vec->size(); ++ihit) {
-			SQHit* hit = m_hit_vec->at(ihit);
-			DetectorID.push_back(hit->get_detector_id());
-			ElementID.push_back(hit->get_element_id());
-			TdcTime.push_back(hit->get_tdc_time());
-			DriftDistance.push_back(hit->get_drift_distance());
-			//cout << "get drift distance: "<< hit->get_drift_distance()<<endl;
-			hit_in_time.push_back(hit->is_in_time());
-		}
-	}
-
-	if (m_trig_hit_vec) {
-		for (int ihit = 0; ihit < m_trig_hit_vec->size(); ++ihit) {
-			SQHit* hit = m_trig_hit_vec->at(ihit);
-			Trig_DetectorID.push_back(hit->get_detector_id());
-			Trig_ElementID.push_back(hit->get_element_id());
-			Trig_TdcTime.push_back(hit->get_tdc_time());
-			Trig_DriftDistance.push_back(hit->get_drift_distance());
-			Trig_hit_in_time.push_back(hit->is_in_time());
-		}   
-	}   
+if (m_trig_hit_vec) {
+    for (int ihit = 0; ihit < m_trig_hit_vec->size(); ++ihit) {
+        SQHit* hit = m_trig_hit_vec->at(ihit);
+        triggerDetectorIDs.push_back(hit->get_detector_id());
+        triggerElementIDs.push_back(hit->get_element_id());
+        triggerTdcTimes.push_back(hit->get_tdc_time());
+        triggerDriftDistances.push_back(hit->get_drift_distance());
+        triggerHitsInTime.push_back(hit->is_in_time());
+    }
+}
 
 	m_tree->Fill();
 	return 0;
@@ -148,16 +149,16 @@ void Fun4AllVectEventOutputManager::CloseFile() {
 }
 
 void Fun4AllVectEventOutputManager::ResetBranches() {
-    DetectorID.clear();
-    ElementID.clear();
-    TdcTime.clear();
-    DriftDistance.clear();
-    hit_in_time.clear();
+    detectorIDs.clear();
+    elementIDs.clear();
+    tdcTimes.clear();
+    driftDistances.clear();
+    hitsInTime.clear();
 
-    Trig_DetectorID.clear();
-    Trig_ElementID.clear();
-    Trig_TdcTime.clear();
-    Trig_DriftDistance.clear();
-    Trig_hit_in_time.clear();
+    triggerDetectorIDs.clear();
+    triggerElementIDs.clear();
+    triggerTdcTimes.clear();
+    triggerDriftDistances.clear();
+    triggerHitsInTime.clear();
 }
 

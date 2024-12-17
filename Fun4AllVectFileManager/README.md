@@ -7,22 +7,36 @@ The `Fun4AllVectEventOutputManager` is an output file manager in the Fun4All fra
 ## Goal
 The Fun4All framework does not support random indexing in the Fun4All event processing server. Therefore, translating the data into a convenient format enables us to perform pre- and post-processing using the input/output managers.
 
-### Registered Branches
-- `EventID`
-- `RunID`
-- `SpillID`
-- `fpga_triggers`
-- `nim_triggers`
-- `Intensity`
-- `DetectorID`
-- `ElementID`
-- `DriftDistance`
-- `TdcTime`
-- `hit_in_time`
-- `Trig_DriftDistance`
-- `Trig_ElementID`
-- `Trig_TdcTime`
-- `Trig_hit_in_time`
+# Updated Variable Names and Types
+
+## Event-Level Variables
+| Variable Name      | Type               | Description                          |
+|--------------------|--------------------|--------------------------------------|
+| `eventID`          | `int`              | Unique identifier for the event      |
+| `runID`            | `int`              | Identifier for the current run       |
+| `spillID`          | `int`              | Identifier for the spill in the run  |
+| `fpgaTriggers`     | `int[5]`           | Array of FPGA trigger counts         |
+| `nimTriggers`      | `int[5]`           | Array of NIM trigger counts          |
+| `intensity`        | `int[33]`          | Array for QIE RF intensities         |
+
+## Hit-Level Variables
+| Variable Name          | Type                     | Description                                  |
+|------------------------|--------------------------|----------------------------------------------|
+| `detectorID`           | `std::vector<int>`       | Detector IDs for all hits                    |
+| `elementID`            | `std::vector<int>`       | Element IDs associated with each hit         |
+| `driftDistance`        | `std::vector<double>`    | Drift distances for each hit                 |
+| `tdcTime`              | `std::vector<double>`    | TDC timing values for each hit               |
+| `hitInTime`            | `std::vector<bool>`      | Flags indicating if hits are within time     |
+
+## Trigger-Level Hit Variables
+| Variable Name              | Type                     | Description                                  |
+|----------------------------|--------------------------|----------------------------------------------|
+| `trigDetectorID`           | `std::vector<int>`       | Detector IDs for triggered hits              |
+| `trigElementID`            | `std::vector<int>`       | Element IDs for triggered hits               |
+| `trigDriftDistance`        | `std::vector<double>`    | Drift distances for triggered hits           |
+| `trigTdcTime`              | `std::vector<double>`    | TDC timing values for triggered hits         |
+| `trigHitInTime`            | `std::vector<bool>`      | Flags indicating if triggered hits are in time |
+
 
 ``` Compilation
 source Fun4AllVectFileManager ../setup.sh

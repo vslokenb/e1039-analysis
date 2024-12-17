@@ -53,27 +53,26 @@ protected:
 
     TFile* _fin;
     TTree* _tin;
+int eventID;
+int spillID;
+int runID;
 
-    // Data vectors for ROOT file branches
-    int EventID;
-    int SpillID;
-    int RunID;
-    
-    std::vector<int>* DetectorID = nullptr;
-    std::vector<int>* ElementID = nullptr;
-    std::vector<double>* DriftDistance = nullptr;
-    std::vector<double>* TdcTime = nullptr;
-    std::vector<bool>* hit_in_time=nullptr;
+std::vector<int>* detectorIDs = nullptr;
+std::vector<int>* elementIDs = nullptr;
+std::vector<double>* driftDistances = nullptr;
+std::vector<double>* tdcTimes = nullptr;
+std::vector<bool>* hitsInTime = nullptr;
 
-    std::vector<int>* Trig_DetectorID = nullptr;
-    std::vector<int>* Trig_ElementID = nullptr;
-    std::vector<double>* Trig_TdcTime = nullptr;
-    std::vector<int>* Trig_DriftDistance = nullptr;
-    std::vector<bool>* Trig_hit_in_time=nullptr;
+std::vector<int>* triggerDetectorIDs = nullptr;
+std::vector<int>* triggerElementIDs = nullptr;
+std::vector<double>* triggerTdcTimes = nullptr;
+std::vector<int>* triggerDriftDistances = nullptr;
+std::vector<bool>* triggerHitsInTime = nullptr;
 
-    int fpga_triggers[5] = {0};
-    int nim_triggers[5] = {0};
-    int Intensity[33] = {0};
+int fpgaTriggers[5] = {0};
+int nimTriggers[5] = {0};
+int rfIntensities[33] = {0};
+
 
    SQRun*       run_header;
    SQSpillMap*  spill_map;
