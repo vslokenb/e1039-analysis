@@ -11,9 +11,21 @@ R__LOAD_LIBRARY(libSQPrimaryGen)
 R__LOAD_LIBRARY(libGenRoadset)
 using namespace std;
 
-int Fun4All(const int n_evt=0, const int KMag_polarity=+1, const double KMag_scale=1.0)
+int Fun4All(const int n_evt=0, const int KMag_polarity=+1, const double KMag_scale=1.0, double st3_pos_dif=0 )
 {
   recoConsts *rc = recoConsts::instance();
+  GeomSvc::UseDbSvc(true);
+  GeomSvc *geom_svc = GeomSvc::instance();
+  std::vector<std::string> St3detectors={"D3mU","D3mUp","D3mX","D3mXp","D3mV","D3mVp","D3pU","D3pUp","D3pX","D3pXp","D3pV","D3pVp","H3B","H3T"};
+  for (auto det : St3detectors){
+    geom_svc->setDetectorZ0(det, geom_svc->getDetectorZ0(det)+st3_pos_dif);
+    //int id=geom_svc->getDetectorID(det);
+    //geom_svc->getPlane(id).z0=geom_svc->getDetectorZ0(det)+st3_pos_dif;
+    //geom_svc->initWireLUT();
+    std::cout<<"detector: "<<det<<" ID: "<<geom_svc->getDetectorID(det)<<" Z0: "<<geom_svc->getDetectorZ0(det)<<std::endl;
+  }
+
+  // I THINK THIS RECO CONSTS WILL HANDLE IT ALL :), need to update
   Fun4AllServer *se = Fun4AllServer::instance();
 
   ///
@@ -23,6 +35,102 @@ int Fun4All(const int n_evt=0, const int KMag_polarity=+1, const double KMag_sca
   double FMAGSTR = -1.044; // -1.054; F&KMAGSTR were changed on 2024-06-28
   double KMAGSTR = -1.025 * KMag_scale * KMag_polarity; // -0.951
   rc->set_IntFlag   ("RUNNUMBER", run_id);
+
+  if (st3_pos_dif > -75)
+    {
+	    rc->set_DoubleFlag("ST3_HM_scaling_factor", 1.0);
+	    
+	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_X_DC3p", 1.93);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_U_DC3p", 2.04);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_V_DC3p", 1.82);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_X_DC3m", 1.99);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_U_DC3m", 2.11);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_V_DC3m", 1.89);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_X_DC3p", 1.70);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_U_DC3p", 1.78);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_V_DC3p", 1.62);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_X_DC3m", 1.75);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_U_DC3m", 1.84);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_V_DC3m", 1.66);
+	    
+	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_X_DC3p", 0.25);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_U_DC3p", 0.25);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_V_DC3p", 0.25);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_X_DC3m", 0.25);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_U_DC3m", 0.25);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_V_DC3m", 0.25);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_X_DC3p", 0.3);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_U_DC3p", 0.3);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_V_DC3p", 0.3);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_X_DC3m", 0.3);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_U_DC3m", 0.3);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_V_DC3m", 0.3);
+	    
+    }
+    if (st3_pos_dif<=-75 && st3_pos_dif>-125){
+	    rc->set_DoubleFlag("ST3_HM_scaling_factor", 1.5);
+	    
+	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_X_DC3p", 2.14);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_U_DC3p", 2.28);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_V_DC3p", 2.00);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_X_DC3m", 2.24);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_U_DC3m", 2.40);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_V_DC3m", 2.09);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_X_DC3p", 1.87);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_U_DC3p", 1.97);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_V_DC3p", 1.76);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_X_DC3m", 1.95);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_U_DC3m", 2.08);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_V_DC3m", 1.84);
+	    
+	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_X_DC3p", 0.25);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_U_DC3p", 0.25);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_V_DC3p", 0.25);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_X_DC3m", 0.25);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_U_DC3m", 0.25);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_V_DC3m", 0.25);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_X_DC3p", 0.3);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_U_DC3p", 0.3);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_V_DC3p", 0.3);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_X_DC3m", 0.3);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_U_DC3m", 0.3);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_V_DC3m", 0.3);
+	    
+	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER", 2.18);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER", 1.91);
+    }
+    if (st3_pos_dif<=-125 && st3_pos_dif>-225){
+	    rc->set_DoubleFlag("ST3_HM_scaling_factor", 2.0);
+	    
+	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_X_DC3p", 2.45);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_U_DC3p", 2.65);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_V_DC3p", 2.27);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_X_DC3m", 2.61);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_U_DC3m", 2.84);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_V_DC3m", 2.40);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_X_DC3p", 2.13);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_U_DC3p", 2.30);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_V_DC3p", 1.99);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_X_DC3m", 2.27);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_U_DC3m", 2.47);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_V_DC3m", 2.10);
+	    
+	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_X_DC3p", 0.25);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_U_DC3p", 0.25);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_V_DC3p", 0.25);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_X_DC3m", 0.25);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_U_DC3m", 0.25);
+	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_V_DC3m", 0.25);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_X_DC3p", 0.3);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_U_DC3p", 0.3);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_V_DC3p", 0.3);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_X_DC3m", 0.3);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_U_DC3m", 0.3);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_V_DC3m", 0.3);
+	    
+	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER", 2.54);
+	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER", 2.21);
+    }
   rc->set_DoubleFlag("FMAGSTR", FMAGSTR);
   rc->set_DoubleFlag("KMAGSTR", KMAGSTR);
   rc->set_CharFlag("VTX_GEN_MATERIAL_MODE", "Target");

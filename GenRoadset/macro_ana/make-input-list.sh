@@ -29,7 +29,7 @@ function MakeOneList {
 #MakeOneList ../macro_gen_signal/data/main_zero_H1Xgap signal_tree.root list_signal_zeroKMAG.txt
 
 echo "## Signal List: KMag = 50% Norm, H1X gap"
-MakeOneList ../macro_gen_signal/data/main_normal050 signal_tree.root list_signal_KMagNormal050.txt
+MakeOneList /pnfs/e1039/scratch/users/vsloken/GenRoadset/data_signal/main_v2_H1Xgap_test signal_tree.root list_signal_KMagNormal050.txt
 
 #echo "## BG List: Reverse KMag polarity"
 #MakeOneList ../macro_full_bg/data/main_01_nim3pot_reverseMag bg_data.root list_bg_fullsimRun06_reverseKMAG.txt

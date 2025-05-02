@@ -1,9 +1,10 @@
+
 #!/bin/bash
 DIR_MACRO=$(dirname $(readlink -f $BASH_SOURCE))
 
 KMAG_POL=+1
 KMAG_SC=1.0
-JOB_NAME=main_v2_H1Xgap # KMag polarity = Normal
+JOB_NAME=main_v2_H1Xgap_test_no_shift # KMag polarity = Normal
 
 #KMAG_POL=-1
 #KMAG_SC=1.0
@@ -22,14 +23,16 @@ USE_GRID=no
 JOB_B=1
 JOB_E=1
 N_EVT=10
+ST3_POS_DIF=0
 OPTIND=1
-while getopts ":n:ogj:e:" OPT ; do
+while getopts ":n:ogj:es:" OPT ; do
     case $OPT in
 	n ) JOB_NAME=$OPTARG ;;
 	o ) DO_OVERWRITE=yes ;;
         g ) USE_GRID=yes ;;
         j ) JOB_E=$OPTARG ;;
         e ) N_EVT=$OPTARG ;;
+	s ) ST3_POS_DIF=$OPTARG ;;
     esac
 done
 shift $((OPTIND - 1))
@@ -44,6 +47,7 @@ echo "DO_OVERWRITE = $DO_OVERWRITE"
 echo "USE_GRID     = $USE_GRID"
 echo "JOB_B...E    = $JOB_B...$JOB_E"
 echo "N_EVT        = $N_EVT"
+echo "ST3_POS_DIF = $ST3_POS_DIF"
 if [ $USE_GRID == yes ]; then
     DIR_DATA=/pnfs/e1039/scratch/users/$USER/GenRoadset/data_signal
     DIR_WORK=$DIR_DATA/$JOB_NAME
@@ -79,7 +83,7 @@ for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
 	CMD+=" -L $DIR_WORK_JOB/log_gridrun.txt"
 	CMD+=" -f $DIR_WORK/input.tar.gz"
 	CMD+=" -d OUTPUT $DIR_WORK_JOB/out"
-	CMD+=" file://$DIR_WORK_JOB/gridrun.sh $N_EVT $KMAG_POL $KMAG_SC"
+	CMD+=" file://$DIR_WORK_JOB/gridrun.sh $N_EVT $KMAG_POL $KMAG_SC $ST3_POS_DIF"
 	unbuffer $CMD |& tee $DIR_WORK_JOB/log_jobsub_submit.txt
 	RET_SUB=${PIPESTATUS[0]}
 	test $RET_SUB -ne 0 && exit $RET_SUB
@@ -89,6 +93,6 @@ for (( JOB_I = $JOB_B; JOB_I <= $JOB_E; JOB_I++ )) ; do
 	mkdir -p $DIR_WORK_JOB/in
 	cp -p $DIR_WORK/input.tar.gz $DIR_WORK_JOB/in
 	cd $DIR_WORK_JOB
-	$DIR_WORK_JOB/gridrun.sh $N_EVT $KMAG_POL $KMAG_SC |& tee $DIR_WORK_JOB/log_gridrun.txt
+	$DIR_WORK_JOB/gridrun.sh $N_EVT $KMAG_POL $KMAG_SC $ST3_POS_DIF |& tee $DIR_WORK_JOB/log_gridrun.txt
     fi
 done

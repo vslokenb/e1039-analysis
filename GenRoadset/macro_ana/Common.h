@@ -94,7 +94,7 @@ void GetParams(string& rs_id, double& mass_lo, double& mass_hi, int& inte_cut, d
     list_bg  = "list_bg_fullsimRun06_reverseKMAG.txt";
   } else if (rs_id == "133") {
     mass_lo  = 2.0;
-    mass_hi  = 9.0;
+    mass_hi  = 9.0; 
     inte_cut = 1000; // Does not matter
     frac_cut = 0;
     list_bg  =  "list_bg_fullsimRun06.txt";
@@ -118,6 +118,6 @@ void GetParams(string& rs_id, double& mass_lo, double& mass_hi, int& inte_cut, d
     inte_cut = 80500; // with 45000
     frac_cut = 0.140; // 0.140 too small, 0.141 too large
     list_sig = "list_signal_KMagNormal050.txt";
-    list_bg  = "list_bg_KMagNormal050.txt";
+    //list_bg  = "list_bg_KMagNormal050.txt";
   }
 }
