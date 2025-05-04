@@ -32,7 +32,7 @@ int Fun4All(const int n_evt=0, double st3_pos_dif=0.,const int KMag_polarity=+1,
   if (st3_pos_dif<=-125 && st3_pos_dif>-225){
     rc->set_DoubleFlag("ST3_HM_scaling_factor", 2.0);
     }
-  //GeomSvc::UseDbSvc(true);
+  GeomSvc::UseDbSvc(true);
   GeomSvc *geom_svc = GeomSvc::instance();
   /*
   std::cout << "print geometry information" << std::endl;
