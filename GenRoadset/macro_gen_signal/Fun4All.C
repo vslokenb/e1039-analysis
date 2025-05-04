@@ -11,129 +11,71 @@ R__LOAD_LIBRARY(libSQPrimaryGen)
 R__LOAD_LIBRARY(libGenRoadset)
 using namespace std;
 
-int Fun4All(const int n_evt=0, const int KMag_polarity=+1, const double KMag_scale=1.0, double st3_pos_dif=0 )
+int Fun4All(const int n_evt=0, double st3_pos_dif=0.,const int KMag_polarity=+1, const double KMag_scale=1.0)
 {
   recoConsts *rc = recoConsts::instance();
-  GeomSvc::UseDbSvc(true);
+  const int run_id = 5433;//5433; // To select the plane geometry.
+  double FMAGSTR = -1.044; // -1.054; F&KMAGSTR were changed on 2024-06-28
+  double KMAGSTR = -1.025 * KMag_scale * KMag_polarity; // -0.951
+  std::cout << st3_pos_dif << std::endl;
+  rc->set_IntFlag("RUNNUMBER", run_id);
+  rc->set_DoubleFlag("FMAGSTR", FMAGSTR);
+  rc->set_DoubleFlag("KMAGSTR", KMAGSTR);
+  rc->set_CharFlag("VTX_GEN_MATERIAL_MODE", "Target");
+  rc->set_DoubleFlag("Z_ST3",1910+st3_pos_dif);
+  if (st3_pos_dif > -75){
+	    rc->set_DoubleFlag("ST3_HM_scaling_factor", 1.0);
+    }
+  if (st3_pos_dif<=-75 && st3_pos_dif>-125){
+    rc->set_DoubleFlag("ST3_HM_scaling_factor", 1.5);
+    }
+  if (st3_pos_dif<=-125 && st3_pos_dif>-225){
+    rc->set_DoubleFlag("ST3_HM_scaling_factor", 2.0);
+    }
+  //GeomSvc::UseDbSvc(true);
   GeomSvc *geom_svc = GeomSvc::instance();
+  /*
+  std::cout << "print geometry information" << std::endl;
+  geom_svc->printWirePosition();
+  std::cout << " align printing " << std::endl;
+  geom_svc->printAlignPar();
+  std::cout << " table printing" << std::endl;
+  geom_svc->printTable();
+  std::cout << "done geometry printing" << std::endl;
+  */
   std::vector<std::string> St3detectors={"D3mU","D3mUp","D3mX","D3mXp","D3mV","D3mVp","D3pU","D3pUp","D3pX","D3pXp","D3pV","D3pVp","H3B","H3T"};
   for (auto det : St3detectors){
     geom_svc->setDetectorZ0(det, geom_svc->getDetectorZ0(det)+st3_pos_dif);
-    //int id=geom_svc->getDetectorID(det);
+    int id=geom_svc->getDetectorID(det);
+    if (id <= 0) {
+      cout << "Detector not found: " << det << endl;
+      continue;
+    }
+    double z0 = geom_svc->getDetectorZ0(det);
+    int nelements = geom_svc->getPlaneNElements(id);
+
+    cout << "  " << det
+         << " | ID: " << id
+         << " | Z0: " << fixed << setprecision(2) << z0
+         << " | N_elements: " << nelements
+         << endl;
+    cout << "=============================" << endl;
     //geom_svc->getPlane(id).z0=geom_svc->getDetectorZ0(det)+st3_pos_dif;
     //geom_svc->initWireLUT();
-    std::cout<<"detector: "<<det<<" ID: "<<geom_svc->getDetectorID(det)<<" Z0: "<<geom_svc->getDetectorZ0(det)<<std::endl;
-  }
-
+    //std::cout<<"detector: "<<det<<" ID: "<<geom_svc->getDetectorID(det)<<" Z0: "<<geom_svc->getDetectorZ0(det)<<std::endl;
+  } 
+  
   // I THINK THIS RECO CONSTS WILL HANDLE IT ALL :), need to update
   Fun4AllServer *se = Fun4AllServer::instance();
+
+  
+  se->Verbosity(1);
 
   ///
   /// Global parameters
   ///
-  const int run_id = 5433; // To select the plane geometry.
-  double FMAGSTR = -1.044; // -1.054; F&KMAGSTR were changed on 2024-06-28
-  double KMAGSTR = -1.025 * KMag_scale * KMag_polarity; // -0.951
-  rc->set_IntFlag   ("RUNNUMBER", run_id);
 
-  if (st3_pos_dif > -75)
-    {
-	    rc->set_DoubleFlag("ST3_HM_scaling_factor", 1.0);
-	    
-	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_X_DC3p", 1.93);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_U_DC3p", 2.04);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_V_DC3p", 1.82);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_X_DC3m", 1.99);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_U_DC3m", 2.11);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_V_DC3m", 1.89);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_X_DC3p", 1.70);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_U_DC3p", 1.78);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_V_DC3p", 1.62);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_X_DC3m", 1.75);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_U_DC3m", 1.84);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_V_DC3m", 1.66);
-	    
-	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_X_DC3p", 0.25);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_U_DC3p", 0.25);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_V_DC3p", 0.25);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_X_DC3m", 0.25);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_U_DC3m", 0.25);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_V_DC3m", 0.25);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_X_DC3p", 0.3);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_U_DC3p", 0.3);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_V_DC3p", 0.3);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_X_DC3m", 0.3);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_U_DC3m", 0.3);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_V_DC3m", 0.3);
-	    
-    }
-    if (st3_pos_dif<=-75 && st3_pos_dif>-125){
-	    rc->set_DoubleFlag("ST3_HM_scaling_factor", 1.5);
-	    
-	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_X_DC3p", 2.14);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_U_DC3p", 2.28);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_V_DC3p", 2.00);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_X_DC3m", 2.24);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_U_DC3m", 2.40);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_V_DC3m", 2.09);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_X_DC3p", 1.87);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_U_DC3p", 1.97);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_V_DC3p", 1.76);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_X_DC3m", 1.95);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_U_DC3m", 2.08);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_V_DC3m", 1.84);
-	    
-	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_X_DC3p", 0.25);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_U_DC3p", 0.25);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_V_DC3p", 0.25);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_X_DC3m", 0.25);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_U_DC3m", 0.25);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_V_DC3m", 0.25);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_X_DC3p", 0.3);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_U_DC3p", 0.3);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_V_DC3p", 0.3);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_X_DC3m", 0.3);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_U_DC3m", 0.3);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_V_DC3m", 0.3);
-	    
-	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER", 2.18);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER", 1.91);
-    }
-    if (st3_pos_dif<=-125 && st3_pos_dif>-225){
-	    rc->set_DoubleFlag("ST3_HM_scaling_factor", 2.0);
-	    
-	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_X_DC3p", 2.45);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_U_DC3p", 2.65);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_V_DC3p", 2.27);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_X_DC3m", 2.61);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_U_DC3m", 2.84);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER_V_DC3m", 2.40);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_X_DC3p", 2.13);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_U_DC3p", 2.30);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_V_DC3p", 1.99);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_X_DC3m", 2.27);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_U_DC3m", 2.47);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER_V_DC3m", 2.10);
-	    
-	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_X_DC3p", 0.25);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_U_DC3p", 0.25);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_V_DC3p", 0.25);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_X_DC3m", 0.25);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_U_DC3m", 0.25);
-	    rc->set_DoubleFlag("SAGITTA_TARGET_WIDTH_V_DC3m", 0.25);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_X_DC3p", 0.3);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_U_DC3p", 0.3);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_V_DC3p", 0.3);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_X_DC3m", 0.3);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_U_DC3m", 0.3);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_WIDTH_V_DC3m", 0.3);
-	    
-	    rc->set_DoubleFlag("SAGITTA_TARGET_CENTER", 2.54);
-	    rc->set_DoubleFlag("SAGITTA_DUMP_CENTER", 2.21);
-    }
-  rc->set_DoubleFlag("FMAGSTR", FMAGSTR);
-  rc->set_DoubleFlag("KMAGSTR", KMAGSTR);
-  rc->set_CharFlag("VTX_GEN_MATERIAL_MODE", "Target");
+  
 
   ///
   /// Event generator
@@ -175,10 +117,12 @@ int Fun4All(const int n_evt=0, const int KMag_polarity=+1, const double KMag_sca
   g4Reco->SetWorldMaterial("G4_AIR"); //G4_Galactic, G4_AIR
   g4Reco->SetPhysicsList("FTFP_BERT");
 
+  g4Reco->Print("ALL"); //DEBUG PRINT
+
   SetupInsensitiveVolumes(g4Reco);
   SetupBeamline(g4Reco);
   SetupTarget(g4Reco);
-  SetupSensitiveDetectors(g4Reco);
+  SetupSensitiveDetectors(g4Reco,true,false,"SQ_ArCO2","SQ_Scintillator",2);
 
   se->registerSubsystem(g4Reco);
 
@@ -187,6 +131,8 @@ int Fun4All(const int n_evt=0, const int KMag_polarity=+1, const double KMag_sca
 
   /// digitizer
   SQDigitizer *digitizer = new SQDigitizer("DPDigitizer", 0);
+  digitizer->set_enable_st1dc(false);
+  digitizer->set_enable_dphodo(false); 
   se->registerSubsystem(digitizer);
 
   /// Save only events that are in the geometric acceptance.
@@ -195,7 +141,7 @@ int Fun4All(const int n_evt=0, const int KMag_polarity=+1, const double KMag_sca
   geom_acc->SetPlaneMode(SQGeomAcc::HODO_CHAM);
   geom_acc->SetNumOfH1EdgeElementsExcluded(4);
   se->registerSubsystem(geom_acc);
-
+  
   // Make SQ nodes for truth info
   TruthNodeMaker* tnm = new TruthNodeMaker();
   se->registerSubsystem(tnm);
