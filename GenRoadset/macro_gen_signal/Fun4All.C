@@ -10,10 +10,61 @@ R__LOAD_LIBRARY(libg4dst)
 R__LOAD_LIBRARY(libSQPrimaryGen)
 R__LOAD_LIBRARY(libGenRoadset)
 using namespace std;
-
-int Fun4All(const int n_evt=0, const int KMag_polarity=+1, const double KMag_scale=1.0)
+int Fun4All(const int n_evt=0, double st3_pos_dif=0.,const int KMag_polarity=+1, const double KMag_scale=1.0)
 {
   recoConsts *rc = recoConsts::instance();
+  const int run_id = 5433;//5433; // To select the plane geometry.
+  double FMAGSTR = -1.044; // -1.054; F&KMAGSTR were changed on 2024-06-28
+  double KMAGSTR = -1.025 * KMag_scale * KMag_polarity; // -0.951
+  std::cout << st3_pos_dif << std::endl;
+  rc->set_IntFlag("RUNNUMBER", run_id);
+  rc->set_DoubleFlag("FMAGSTR", FMAGSTR);
+  rc->set_DoubleFlag("KMAGSTR", KMAGSTR);
+  rc->set_CharFlag("VTX_GEN_MATERIAL_MODE", "Target");
+  rc->set_DoubleFlag("Z_ST3",1910+st3_pos_dif);
+  if (st3_pos_dif > -75){
+	    rc->set_DoubleFlag("ST3_HM_scaling_factor", 1.0);
+    }
+  if (st3_pos_dif<=-75 && st3_pos_dif>-125){
+    rc->set_DoubleFlag("ST3_HM_scaling_factor", 1.5);
+    }
+  if (st3_pos_dif<=-125 && st3_pos_dif>-225){
+    rc->set_DoubleFlag("ST3_HM_scaling_factor", 2.0);
+    }
+  GeomSvc::UseDbSvc(true);
+  GeomSvc *geom_svc = GeomSvc::instance();
+  /*
+  std::cout << "print geometry information" << std::endl;
+  geom_svc->printWirePosition();
+  std::cout << " align printing " << std::endl;
+  geom_svc->printAlignPar();
+  std::cout << " table printing" << std::endl;
+  geom_svc->printTable();
+  std::cout << "done geometry printing" << std::endl;
+  */
+  std::vector<std::string> St3detectors={"D3mU","D3mUp","D3mX","D3mXp","D3mV","D3mVp","D3pU","D3pUp","D3pX","D3pXp","D3pV","D3pVp","H3B","H3T"};
+  for (auto det : St3detectors){
+    geom_svc->setDetectorZ0(det, geom_svc->getDetectorZ0(det)+st3_pos_dif);
+    int id=geom_svc->getDetectorID(det);
+    if (id <= 0) {
+      cout << "Detector not found: " << det << endl;
+      continue;
+    }
+    double z0 = geom_svc->getDetectorZ0(det);
+    int nelements = geom_svc->getPlaneNElements(id);
+
+    cout << "  " << det
+         << " | ID: " << id
+         << " | Z0: " << fixed << setprecision(2) << z0
+         << " | N_elements: " << nelements
+         << endl;
+    cout << "=============================" << endl;
+    //geom_svc->getPlane(id).z0=geom_svc->getDetectorZ0(det)+st3_pos_dif;
+    //geom_svc->initWireLUT();
+    //std::cout<<"detector: "<<det<<" ID: "<<geom_svc->getDetectorID(det)<<" Z0: "<<geom_svc->getDetectorZ0(det)<<std::endl;
+  } 
+
+  // I THINK THIS RECO CONSTS WILL HANDLE IT ALL :)
   Fun4AllServer *se = Fun4AllServer::instance();
 
   ///
