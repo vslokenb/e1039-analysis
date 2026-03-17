@@ -14,15 +14,9 @@ echo "HOST   = $HOSTNAME"
 echo "PWD    = $PWD"
 
 tar xzf $CONDOR_DIR_INPUT/input.tar.gz
+source setup.sh
 
-FN_SETUP=/e906/app/software/osg/software/e1039/this-e1039.sh
-if [ ! -e $FN_SETUP ] ; then # On grid
-    FN_SETUP=/cvmfs/seaquest.opensciencegrid.org/seaquest/${FN_SETUP#/e906/app/software/osg/}
-fi
-echo "SETUP = $FN_SETUP"
-source $FN_SETUP
-export   LD_LIBRARY_PATH=inst/lib:$LD_LIBRARY_PATH
-export ROOT_INCLUDE_PATH=inst/include:$ROOT_INCLUDE_PATH
+touch timestamp.txt # All files created after this will be moved to CONDOR_DIR_OUTPUT
 
 time root -b -q "Fun4Sim.C(\"$CONDOR_DIR_INPUT/$FN_SIG\", \"$CONDOR_DIR_INPUT/$FN_EMB\", $N_EVT)"
 RET=$?
@@ -31,6 +25,8 @@ if [ $RET -ne 0 ] ; then
     exit $RET
 fi
 
-mv *.root $CONDOR_DIR_OUTPUT
+echo "$RET" >status.txt
+
+find . -mindepth 1 -maxdepth 1 -newer timestamp.txt -exec mv {} $CONDOR_DIR_OUTPUT \;
 
 echo "gridrun.sh finished!"
