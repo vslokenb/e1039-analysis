@@ -121,7 +121,8 @@ int Fun4All(const int n_evt=0, double st3_pos_dif=0.,const int KMag_polarity=+1,
   SetupInsensitiveVolumes(g4Reco);
   SetupBeamline(g4Reco);
   SetupTarget(g4Reco);
-  SetupSensitiveDetectors(g4Reco);
+
+  SetupSensitiveDetectors(g4Reco,true,false,"SQ_ArCO2","SQ_Scintillator",2);
 
   se->registerSubsystem(g4Reco);
 
@@ -130,6 +131,8 @@ int Fun4All(const int n_evt=0, double st3_pos_dif=0.,const int KMag_polarity=+1,
 
   /// digitizer
   SQDigitizer *digitizer = new SQDigitizer("DPDigitizer", 0);
+  digitizer->set_enable_st1dc(false);
+  digitizer->set_enable_dphodo(false); 
   se->registerSubsystem(digitizer);
 
   /// Save only events that are in the geometric acceptance.
