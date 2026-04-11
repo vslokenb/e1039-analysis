@@ -125,7 +125,7 @@ int AnaModule::process_event(PHCompositeNode* topNode)
     }
   }
 
-  if (rawEvent->getTriggerBits()>0 && (rawEvent->getTriggerBits() & (nim1TriggerMask|nim3TriggerMask) != 0)){
+  if (rawEvent->getTriggerBits()>0 && ((rawEvent->getTriggerBits() & (nim1TriggerMask|nim3TriggerMask)) != 0)){
     saveTree->Fill();
   }
 
