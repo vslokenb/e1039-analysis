@@ -12,41 +12,70 @@ class TTree;
 class SQHitVector;
 class SRecTrack;
 class SRecEvent;
+class SQTrackVector;
+class SQDimuonVector;
+class SQEvent;
 
-class AnaModule: public SubsysReco 
+class AnaModule : public SubsysReco
 {
 public:
-  AnaModule() {;}
-  virtual ~AnaModule() {;}
+  AnaModule() { ; }
+  virtual ~AnaModule() { ; }
 
-  int Init(PHCompositeNode* topNode);
-  int InitRun(PHCompositeNode* topNode);
-  int process_event(PHCompositeNode* topNode);
-  int End(PHCompositeNode* topNode);
+  int Init(PHCompositeNode *topNode);
+  int InitRun(PHCompositeNode *topNode);
+  int process_event(PHCompositeNode *topNode);
+  int End(PHCompositeNode *topNode);
 
-  void set_output_filename(const TString& n) { saveName = n; }
-  void set_reco(bool b){ saveReco = b;}
+  void set_output_filename(const TString &n) { saveName = n; }
+  void set_reco(bool b) { saveReco = b; }
+  void set_additional_information(const TString &n) { additional_information = n; }
+  void reset_event_number() { event_number = 0; }
 
 private:
-  int GetNodes(PHCompositeNode* topNode);
+  int GetNodes(PHCompositeNode *topNode);
   int ResetEvalVars();
   void MakeTree();
 
   // Input
-  SRawEvent* rawEvent;
-  SRecEvent* recEvent;
+  // SRawEvent* rawEvent;
+  SQEvent *Event;
+  // SQHitVector *hitVector;
+  // SQHitVector *triggerHitVector;
+  SRawEvent *rawEvent;
+  SRecEvent *recEvent;
+
+  SQEvent*     sqEvent        = nullptr;
+  SQHitVector* hitVector      = nullptr;
+  SQHitVector* triggerHitVector = nullptr;  
 
   // Output
   TString saveName;
-  TFile* saveFile;
-  TTree* saveTree;
+  TFile *saveFile;
+  TTree *saveTree;
+  TString additional_information;
 
   Int_t runID, spillID, eventID;
-  Int_t triggerBits;
+  
+  Int_t trigger;
+  bool NIM_1;
+  bool NIM_2;
+  bool NIM_3;
+  bool NIM_4;
+  bool NIM_5;
+  bool MATRIX_1;
+  bool MATRIX_2;
+  bool MATRIX_3;
+  bool MATRIX_4;
+  bool MATRIX_5;
   Int_t nHits;
   Int_t detectorID[15000], elementID[15000];
   Double_t tdcTime[15000], driftDistance[15000], pos[15000];
 
+  Int_t nTriggerHits;
+  Int_t trigger_hit_detectorID[15000], trigger_hit_elementID[15000];
+  Double_t trigger_hit_tdcTime[15000], trigger_hit_driftDistance[15000], trigger_hit_pos[15000];
+  
   int n_tracks;
   int track_charge[100];
   int track_nhits[100];
@@ -79,6 +108,7 @@ private:
   int n_dimuons;
   float dimuon_mass[100];
   float dimuon_chisq[100];
+  float dimuon_chisq_vx[100];
   float dimuon_x_vtx[100];
   float dimuon_y_vtx[100];
   float dimuon_z_vtx[100];
@@ -97,8 +127,8 @@ private:
   float dimuon_npos_x[100];
   float dimuon_npos_y[100];
   float dimuon_npos_z[100];
-
-  bool saveReco=false;
+  int event_number;
+  bool saveReco = false;
 };
 
 #endif

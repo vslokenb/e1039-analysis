@@ -57,6 +57,8 @@ int Fun4All(const int run_id, const int spill_id, const string DST_in, const str
   rc->set_DoubleFlag("RejectWinDC2" , 0.35);
   rc->set_DoubleFlag("RejectWinDC3p", 0.24);
   rc->set_DoubleFlag("RejectWinDC3m", 0.24);
+
+  rc->set_CharFlag("GeomPlane", "2026050501");
   cout << "testing reco consts 2 " << endl;
   if (do_displaced_tracking)  
   {     
@@ -77,6 +79,26 @@ int Fun4All(const int run_id, const int spill_id, const string DST_in, const str
   //cal_hodo->DeleteOutTimeHit();
   //se->registerSubsystem(cal_hodo);
   
+  GeomSvc* geom_svc = GeomSvc::instance();
+  geom_svc->getPlanePtr(55)->cellWidth = 1.015;
+  geom_svc->getPlanePtr(56)->cellWidth = 1.015;
+  geom_svc->getPlanePtr(57)->cellWidth = 1.015;
+  geom_svc->getPlanePtr(58)->cellWidth = 1.015;
+  geom_svc->getPlanePtr(55)->spacing = 1.015;
+  geom_svc->getPlanePtr(56)->spacing = 1.015;
+  geom_svc->getPlanePtr(57)->spacing = 1.015;
+  geom_svc->getPlanePtr(58)->spacing = 1.015;
+  // update the xoffset to make sure the postion for the ch1 for each DP1 quadrant is unchanged when we change the spacing parameter.
+  geom_svc->getPlanePtr(55)->xoffset = -2.7479;
+  geom_svc->getPlanePtr(56)->xoffset = -3.3573;
+  geom_svc->getPlanePtr(57)->xoffset = 3.3576;
+  geom_svc->getPlanePtr(58)->xoffset = 2.6446;
+  geom_svc->initWireLUT();
+  //std::geom after << std::endl;
+
+  geom_svc->printTable();
+  geom_svc->printWirePosition();
+
   CalibDriftDist* cal_dd = new CalibDriftDist();
   //cal_dd->Verbosity(999);
   //cal_dd->DeleteOutTimeHit();
@@ -108,7 +130,7 @@ int Fun4All(const int run_id, const int spill_id, const string DST_in, const str
   // se->registerSubsystem(new SQVertexing("vtx_mm", -1, -1));
   cout << "testing vtx fit "<<  endl;
   VertexFit* vtx_fit = new VertexFit();
-  vtx_fit->Verbosity(3);
+  // vtx_fit->Verbosity(0);
   vtx_fit->set_eval_file_name("vtx_eval.root");
   se->registerSubsystem(vtx_fit);
 
@@ -120,7 +142,7 @@ int Fun4All(const int run_id, const int spill_id, const string DST_in, const str
   AnaModule *ana = new AnaModule();
   ana->set_output_filename("outfile.root");
   ana->set_reco(true);
-  // ana->set_additional_information(infile);
+  ana->set_additional_information(DST_in);
   se->registerSubsystem(ana);
   cout << "testing dst "<<  endl;
   Fun4AllDstInputManager* in = new Fun4AllDstInputManager("DSTIN");
